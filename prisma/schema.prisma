@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Menu {
+  id        Int        @id @default(autoincrement())
+  name      String
+  items     MenuItem[] @relation("MenuItems")
+}
+
+model MenuItem {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  imageUrl    String
+  menu        Menu   @relation(fields: [menuId], references: [id], name: "MenuItems")
+  menuId      Int
+
+  orders      Order[] @relation("OrderItems")
+}
+
+model Order {
+  id        Int        @id @default(autoincrement())
+  items     MenuItem[] @relation("OrderItems", references: [id])
+  status    String     @default("pending")
+  createdAt DateTime   @default(now())
+}
