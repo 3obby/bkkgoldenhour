@@ -8,26 +8,35 @@ generator client {
 }
 
 model Menu {
-  id        Int        @id @default(autoincrement())
-  name      String
-  items     MenuItem[] @relation("MenuItems")
+  id    Int         @id @default(autoincrement())
+  name  String
+  items MenuItem[]  @relation("MenuItems")
 }
 
 model MenuItem {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String
   price       Float
   imageUrl    String
-  menu        Menu   @relation(fields: [menuId], references: [id], name: "MenuItems")
+  menu        Menu       @relation(fields: [menuId], references: [id], name: "MenuItems")
   menuId      Int
 
-  orders      Order[] @relation("OrderItems")
+  orderItems  OrderItem[]
 }
 
 model Order {
-  id        Int        @id @default(autoincrement())
-  items     MenuItem[] @relation("OrderItems", references: [id])
-  status    String     @default("pending")
-  createdAt DateTime   @default(now())
+  id         Int         @id @default(autoincrement())
+  orderItems OrderItem[]
+  status     String      @default("pending")
+  createdAt  DateTime    @default(now())
+}
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  order      Order     @relation(fields: [orderId], references: [id])
+  orderId    Int
+  menuItem   MenuItem  @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  quantity   Int       @default(1)
 }
