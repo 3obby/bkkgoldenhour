@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function EditMenu() {
+function MenuEditor() {
   const [menu, setMenu] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [newItemName, setNewItemName] = useState('');
@@ -113,5 +113,13 @@ export default function EditMenu() {
         <p>Loading Menu...</p>
       )}
     </div>
+  );
+}
+
+export default function EditMenu() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MenuEditor />
+    </Suspense>
   );
 }
