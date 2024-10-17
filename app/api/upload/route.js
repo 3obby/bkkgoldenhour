@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -11,30 +12,40 @@ const s3 = new S3Client({
 });
 
 export async function POST(request) {
+  const formData = await request.formData();
+  const file = formData.get('image');
+
+  if (!file) {
+    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const fileName = `${uuidv4()}-${file.name}`;
+
   try {
-    const formData = await request.formData();
-    const image = formData.get('image');
+    // Resize the image using sharp
+    const resizedImageBuffer = await sharp(buffer)
+      .resize(150, 150)
+      .toBuffer();
 
-    if (!image) {
-      return NextResponse.json({ error: 'No image provided' }, { status: 400 });
-    }
-
-    // Upload image to S3
-    const imageKey = `menu-items/${uuidv4()}-${image.name}`;
-    const uploadParams = {
+    // Upload the resized image to S3
+    const params = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: imageKey,
-      Body: Buffer.from(await image.arrayBuffer()),
-      ContentType: image.type,
+      Key: `menu-items/${fileName}`,
+      Body: resizedImageBuffer,
+      ContentType: file.type,
+      CacheControl: 'public, max-age=31536000, immutable', // Added cache header
     };
-    const command = new PutObjectCommand(uploadParams);
+
+    const command = new PutObjectCommand(params);
     await s3.send(command);
 
-    const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${imageKey}`;
+    const imageUrl = `https://${params.Bucket}.s3.amazonaws.com/${params.Key}`;
 
-    return NextResponse.json({ imageUrl });
+    return NextResponse.json({ imageUrl }, { status: 200 });
   } catch (error) {
     console.error('Error uploading image:', error);
-    return NextResponse.json({ error: 'Error uploading image' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }
