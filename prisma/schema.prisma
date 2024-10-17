@@ -8,35 +8,46 @@ generator client {
 }
 
 model Menu {
-  id    Int         @id @default(autoincrement())
-  name  String
-  items MenuItem[]  @relation("MenuItems")
+  id             Int                 @id @default(autoincrement())
+  name           String
+  menuItemsOnMenu MenuItemOnMenu[]   // Define relation to join table
 }
 
 model MenuItem {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String
-  price       Float
-  imageUrl    String
-  menu        Menu       @relation(fields: [menuId], references: [id], name: "MenuItems")
-  menuId      Int
+  id              Int                  @id @default(autoincrement())
+  name            String
+  description     String
+  price           Float
+  imageUrl        String
 
-  orderItems  OrderItem[]
+  menuItemsOnMenu MenuItemOnMenu[]    // Define relation to join table
+  orderItems      OrderItem[]
+}
+
+model MenuItemOnMenu {
+  menuId      Int
+  menuItemId  Int
+
+  menu        Menu         @relation(fields: [menuId], references: [id])
+  menuItem    MenuItem     @relation(fields: [menuItemId], references: [id])
+
+  @@id([menuId, menuItemId])
+  @@index([menuId])
+  @@index([menuItemId])
 }
 
 model Order {
-  id         Int         @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   orderItems OrderItem[]
-  status     String      @default("pending")
-  createdAt  DateTime    @default(now())
+  status     String       @default("pending")
+  createdAt  DateTime     @default(now())
 }
 
 model OrderItem {
-  id         Int       @id @default(autoincrement())
-  order      Order     @relation(fields: [orderId], references: [id])
+  id         Int          @id @default(autoincrement())
+  order      Order        @relation(fields: [orderId], references: [id])
   orderId    Int
-  menuItem   MenuItem  @relation(fields: [menuItemId], references: [id])
+  menuItem   MenuItem     @relation(fields: [menuItemId], references: [id])
   menuItemId Int
-  quantity   Int       @default(1)
+  quantity   Int          @default(1)
 }

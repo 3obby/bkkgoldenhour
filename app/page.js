@@ -5,16 +5,16 @@ import Link from 'next/link';
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
+  const menuId = 1; // Replace with logic to select the active menu
 
   useEffect(() => {
     async function fetchMenuItems() {
-      // Assume default menu ID is 1 or fetch the active menu
-      const response = await fetch('/api/admin/menus/1/items');
+      const response = await fetch(`/api/admin/menus/${menuId}`);
       const data = await response.json();
-      setMenuItems(data);
+      setMenuItems(data.menuItems);
     }
     fetchMenuItems();
-  }, []);
+  }, [menuId]);
 
   const addToOrder = (item) => {
     // Logic to add item to the user's order (e.g., update local storage or context)
@@ -38,7 +38,6 @@ export default function Menu() {
         <button>View Order</button>
       </Link>
 
-      {/* Add this block to include the Admin Portal button */}
       <Link href="/adminportal">
         <button>Admin Portal</button>
       </Link>
