@@ -11,6 +11,7 @@ export default function Menu() {
     async function fetchMenuItems() {
       const response = await fetch(`/api/admin/menus/${menuId}`);
       const data = await response.json();
+      console.log('Menu Data:', data); // Log the entire response
       setMenuItems(data.menuItems);
     }
     fetchMenuItems();
@@ -21,26 +22,29 @@ export default function Menu() {
   };
 
   return (
-    <div>
-      <h1>Menu</h1>
-      <ul>
-        {menuItems.map((item) => (
-          <li key={item.id}>
-            <img src={item.imageUrl} alt={item.name} width={150} />
-            <h2>{item.name}</h2>
-            <p>{item.description}</p>
-            <p>${item.price.toFixed(2)}</p>
-            <button onClick={() => addToOrder(item)}>Add to Order</button>
-          </li>
-        ))}
-      </ul>
+    <div className="menu-page">
       <Link href="/checkout">
-        <button>View Order</button>
+        <button className="button">View Order</button>
       </Link>
 
       <Link href="/adminportal">
-        <button>Admin Portal</button>
+        <button className="button admin-button">Admin Portal</button>
       </Link>
+      <h1 className="title">Menu</h1>
+      <ul className="menu-list">
+        {menuItems.map((item) => (
+          <li key={item.id} className="menu-item">
+            <img src={item.imageUrl} alt={item.name} width={150} className="item-image" />
+            <h2 className="item-name">{item.name}</h2>
+            <p className="item-description">{item.description}</p>
+            <p className="item-price">${item.price.toFixed(2)}</p>
+            <button onClick={() => addToOrder(item)} className="button">
+              Add to Order
+            </button>
+          </li>
+        ))}
+      </ul>
+      
     </div>
   );
 }

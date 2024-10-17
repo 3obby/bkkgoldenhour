@@ -66,21 +66,23 @@ export default function EditItem() {
   };
 
   return (
-    <div>
-      <h1>Create New Menu Item</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="edit-item">
+      <h1 className="title">Create New Menu Item</h1>
+      <form onSubmit={handleSubmit} className="edit-item-form">
         <input
           type="text"
           placeholder="Item Name"
           value={item.name}
           onChange={(e) => setItem({ ...item, name: e.target.value })}
           required
+          className="input-text"
         />
         <textarea
           placeholder="Item Description"
           value={item.description}
           onChange={(e) => setItem({ ...item, description: e.target.value })}
           required
+          className="textarea"
         />
         <input
           type="number"
@@ -89,27 +91,29 @@ export default function EditItem() {
           value={item.price}
           onChange={(e) => setItem({ ...item, price: e.target.value })}
           required
+          className="input-text"
         />
         <input
           type="file"
           accept="image/*"
           onChange={handleImageChange}
           required
+          className="input-file"
         />
 
         {/* Display upload status and image preview */}
-        {uploadStatus === 'uploading' && <p>Uploading image...</p>}
-        {uploadStatus === 'success' && <p>Image uploaded successfully!</p>}
-        {uploadStatus === 'error' && <p>Error uploading image. Please try again.</p>}
+        {uploadStatus === 'uploading' && <p className="status">Uploading image...</p>}
+        {uploadStatus === 'success' && <p className="status success">Image uploaded successfully!</p>}
+        {uploadStatus === 'error' && <p className="status error">Error uploading image. Please try again.</p>}
 
         {item.imageUrl && (
-          <div>
+          <div className="image-preview">
             <p>Image Preview:</p>
             <img src={item.imageUrl} alt="Uploaded" width={150} />
           </div>
         )}
 
-        <button type="submit" disabled={uploadStatus !== 'success'}>
+        <button type="submit" disabled={uploadStatus !== 'success'} className="button">
           Save Item
         </button>
       </form>

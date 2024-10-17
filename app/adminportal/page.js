@@ -47,43 +47,53 @@ export default function AdminPortal() {
   };
 
   return (
-    <div>
-      <h1>Admin Portal</h1>
+    <div className="admin-portal">
+      <h1 className="title">Admin Portal</h1>
 
       {/* Create New Menu */}
-      <form onSubmit={handleCreateMenu}>
+      <form onSubmit={handleCreateMenu} className="create-menu-form">
         <input
           type="text"
           placeholder="New Menu Name"
           value={newMenuName}
           onChange={(e) => setNewMenuName(e.target.value)}
           required
+          className="input-text"
         />
-        <button type="submit">Create New Menu</button>
+        <button type="submit" className="button">
+          Create New Menu
+        </button>
       </form>
 
       {/* List of Menus */}
-      <h2>Menus</h2>
-      <ul>
+      <h2 className="subtitle">Menus</h2>
+      <ul className="menu-list">
         {menus.map((menu) => (
-          <li key={menu.id}>
-            <h3>{menu.name}</h3>
-            <button onClick={() => handleEditMenu(menu.id)}>Edit Menu</button>
+          <li key={menu.id} className="menu-item">
+            <h3 className="menu-name">{menu.name}</h3>
+            <button
+              onClick={() => handleEditMenu(menu.id)}
+              className="button edit-button"
+            >
+              Edit Menu
+            </button>
           </li>
         ))}
       </ul>
 
       {/* List of Menu Items */}
-      <h2>Menu Items</h2>
-      <ul>
+      <h2 className="subtitle">Menu Items</h2>
+      <ul className="menu-item-list">
         {menuItems.map((item) => (
-          <li key={item.id}>
-            <h3>{item.name}</h3>
+          <li key={item.id} className="menu-item">
+            <h3 className="item-name">{item.name}</h3>
             {/* Add Edit functionality if desired */}
           </li>
         ))}
       </ul>
-      <button onClick={handleAddItem}>Add New Menu Item</button>
+      <button onClick={handleAddItem} className="button">
+        Add New Menu Item
+      </button>
     </div>
   );
 }

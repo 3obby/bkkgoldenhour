@@ -7,10 +7,25 @@ export async function GET(request, { params }) {
     const menu = await prisma.menu.findUnique({
       where: { id: parseInt(id) },
       include: {
-        menuItems: true,
+        menuItemsOnMenu: {
+          include: {
+            menuItem: true
+          }
+        }
       },
     });
-    return NextResponse.json(menu);
+
+    if (!menu) {
+      return NextResponse.json({ error: 'Menu not found' }, { status: 404 });
+    }
+
+    // Transform the data to match the expected structure
+    const transformedMenu = {
+      ...menu,
+      menuItems: menu.menuItemsOnMenu.map(item => item.menuItem)
+    };
+
+    return NextResponse.json(transformedMenu);
   } catch (error) {
     console.error('Error fetching menu:', error);
     return NextResponse.json({ error: 'Error fetching menu' }, { status: 500 });
@@ -25,17 +40,29 @@ export async function PUT(request, { params }) {
     const updatedMenu = await prisma.menu.update({
       where: { id: parseInt(id) },
       data: {
-        menuItems: {
-          set: menuItemIds.map((menuItemId) => ({
-            id: menuItemId,
-          })),
-        },
+        menuItemsOnMenu: {
+          deleteMany: {}, // Remove all existing relations
+          create: menuItemIds.map((menuItemId) => ({
+            menuItem: { connect: { id: menuItemId } }
+          }))
+        }
       },
       include: {
-        menuItems: true,
+        menuItemsOnMenu: {
+          include: {
+            menuItem: true
+          }
+        }
       },
     });
-    return NextResponse.json(updatedMenu);
+
+    // Transform the data to match the expected structure in the frontend
+    const transformedMenu = {
+      ...updatedMenu,
+      menuItems: updatedMenu.menuItemsOnMenu.map(item => item.menuItem)
+    };
+
+    return NextResponse.json(transformedMenu);
   } catch (error) {
     console.error('Error updating menu:', error);
     return NextResponse.json({ error: 'Error updating menu' }, { status: 500 });
