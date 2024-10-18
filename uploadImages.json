@@ -1,0 +1,142 @@
+[
+  {
+    "fileName": "frenchfries.webp",
+    "name": "Crispy French Fries",
+    "description": "Served with your choice of mayonnaise or ketchup",
+    "price": 90,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "jakartastylechickensatay.webp",
+    "name": "Jakarta Style Chicken Satay",
+    "description": "Grilled Chicken Skewers coated in a lightly spicy peanut sauce topped with crunchy shallot",
+    "price": 140,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "panconaioli.webp",
+    "name": "Pan Con Aioli",
+    "description": "Fresh baguette with a side of garlic aioli dip",
+    "price": 90,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "gambasalajillo.webp",
+    "name": "Gambas Al Ajillo",
+    "description": "Garlic king prawns cooked in olive oil with chili and garlic and finished in a Pernod flambé",
+    "price": 180,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "patatasbravas.webp",
+    "name": "Patatas Bravas",
+    "description": "Crunchy potato and chorizo tartlets with our house spicy tomato sauce",
+    "price": 120,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "albondigas.webp",
+    "name": "Albondigas",
+    "description": "Small spiced meatballs fried and finished in our spicy tomato sauce and topped with fresh parsley",
+    "price": 110,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "torchedsalmon.webp",
+    "name": "Torched Salmon",
+    "description": "Cured salmon sashimi, torched and glazed with a Japanese sweet BBQ and yuzu gel, on top of a wasabi mash",
+    "price": 150,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "beefsliders.webp",
+    "name": "Beef Sliders",
+    "description": "Australian Beef Patty with lettuce, tomato, onion, and BBQ sauce",
+    "price": 170,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "tomkhakai.webp",
+    "name": "Tom Kha Kai",
+    "description": "A fragrant Thai coconut soup brimming with tender chicken, fresh mushrooms, and zesty lime leaves. Infused with aromatic lemongrass, galangal, and a hint of chili",
+    "price": 120,
+    "category": ["Small Bites"]
+  },
+  {
+    "fileName": "teriyakisalmon.webp",
+    "name": "Teriyaki Salmon",
+    "description": "Perfectly seared crispy skin salmon glazed with a rich teriyaki sauce, topped with toasted sesame seeds and served with a side salad",
+    "price": 250,
+    "category": ["Mains"]
+  },
+  {
+    "fileName": "spaghettimeatballs.webp",
+    "name": "Spaghetti and Meatballs",
+    "description": "Classic spaghetti topped with hearty pork meatballs and cherry tomatoes in our house marinara sauce, finished with chili and garlic",
+    "price": 190,
+    "category": ["Mains"]
+  },
+  {
+    "fileName": "ribeyesteak.webp",
+    "name": "Rib Eye Steak (175g / 350g)",
+    "description": "Succulent pan seared rib eye steak served with velvety mashed potatoes, tender baby carrots, and a vibrant beetroot gel, with a side of black pepper sauce",
+    "price": 200,
+    "category": ["Mains"]
+  },
+  {
+    "fileName": "cinnamonsugarminichurros.webp",
+    "name": "Cinnamon Sugar Mini Churros",
+    "description": "Sweetened dough fried and coated with cinnamon sugar with a side of chocolate sauce for dipping",
+    "price": 130,
+    "category": ["Sweets"]
+  },
+  {
+    "fileName": "chocolatebrownie.webp",
+    "name": "Chocolate Brownie",
+    "description": "Baked Chocolate Pecan brownie with a vanilla cream sauce topped with fesh strawberries",
+    "price": 165,
+    "category": ["Sweets"]
+  },
+  {
+    "fileName": "mangostickyrice.webp",
+    "name": "Mango Sticky Rice",
+    "description": "A Thai Favorite! Pandan sticky rice covered with a sweetened coconut cream and fresh sweet mango",
+    "price": 120,
+    "category": ["Sweets"]
+  },
+  {
+    "fileName": "khaleesi.webp",
+    "name": "Khaleesi",
+    "description": "Absolute Vodka, Rose Syrup, Lime Juice and sprite with a dragonfruit garnish",
+    "price": 300,
+    "category": ["Specialty Cocktails"]
+  },
+  {
+    "fileName": "butterflyeffect.webp",
+    "name": "Butterfly Effect",
+    "description": "Martini Bianco, Beefeater Gin, Mojito syrup, lime juice, buttefly pea tea and Angosutra bitters",
+    "price": 320,
+    "category": ["Specialty Cocktails"]
+  },
+  {
+    "fileName": "espressomartini.webp",
+    "name": "Espresso Martini",
+    "description": "Absolut Vodka, Kahlua, Espresso, and simple syrup",
+    "price": 320,
+    "category": ["Specialty Cocktails"]
+  },
+  {
+    "fileName": "royalmango.webp",
+    "name": "Royal Mango",
+    "description": "Triple Sec, Tequila Olmeca, Spicy Mango Syrup, Lime Juice, Mango Juice and a paprika rim",
+    "price": 320,
+    "category": ["Specialty Cocktails"]
+  },
+  {
+    "fileName": "princesspeach.webp",
+    "name": "Princess Peach",
+    "description": "Amaretto, Aperol, Peach Schnapps, Lime Juice, Lychee Juice, Orgeat Syrup, and Soda",
+    "price": 320,
+    "category": ["Specialty Cocktails"]
+  }
+]

@@ -8,21 +8,21 @@ generator client {
 }
 
 model Menu {
-  id              Int                 @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   name            String
-  menuItemsOnMenu MenuItemOnMenu[]    // Relation to join table
+  menuItemsOnMenu MenuItemOnMenu[]  // Relation to join table
 }
 
 model MenuItem {
-  id                 Int                   @id @default(autoincrement())
+  id                 Int                  @id @default(autoincrement())
   name               String
   description        String
   price              Float
   imageUrl           String
 
-  menuItemsOnMenu    MenuItemOnMenu[]      // Relation to join table with Menu
+  menuItemsOnMenu    MenuItemOnMenu[]     // Relation to join table with Menu
   orderItems         OrderItem[]
-  menuItemCategories MenuItemCategory[]    // New relation to join table with Category
+  menuItemCategories MenuItemCategory[]   // Relation to join table with Category
 }
 
 model MenuItemOnMenu {
@@ -56,17 +56,19 @@ model MenuItemCategory {
 }
 
 model Order {
-  id         Int          @id @default(autoincrement())
-  orderItems OrderItem[]
-  status     String       @default("pending")
-  createdAt  DateTime     @default(now())
+  id          Int          @id @default(autoincrement())
+  orderItems  OrderItem[]
+  status      String       @default("pending")
+  createdAt   DateTime     @default(now())
+  tableNumber Int?         // Added optional table number
 }
 
 model OrderItem {
-  id         Int          @id @default(autoincrement())
-  order      Order        @relation(fields: [orderId], references: [id])
-  orderId    Int
-  menuItem   MenuItem     @relation(fields: [menuItemId], references: [id])
-  menuItemId Int
-  quantity   Int          @default(1)
+  id          Int          @id @default(autoincrement())
+  order       Order        @relation(fields: [orderId], references: [id])
+  orderId     Int
+  menuItem    MenuItem     @relation(fields: [menuItemId], references: [id])
+  menuItemId  Int
+  quantity    Int          @default(1)
+  comment     String?      // Added optional comment
 }

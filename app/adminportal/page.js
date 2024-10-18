@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image'; // Import Image component from Next.js
 
 export default function AdminPortal() {
   const [menus, setMenus] = useState([]);
@@ -46,6 +47,11 @@ export default function AdminPortal() {
     router.push('/edititem');
   };
 
+  // Function to handle editing an item
+  const handleEditItem = (itemId) => {
+    router.push(`/edititem?id=${itemId}`);
+  };
+
   return (
     <div className="admin-portal">
       <h1 className="title">Admin Portal</h1>
@@ -86,8 +92,28 @@ export default function AdminPortal() {
       <ul className="menu-item-list">
         {menuItems.map((item) => (
           <li key={item.id} className="menu-item">
-            <h3 className="item-name">{item.name}</h3>
-            {/* Add Edit functionality if desired */}
+            <div className="item-content">
+              {/* Image on the left */}
+              <Image
+                src={item.imageUrl}
+                alt={item.name}
+                width={100}
+                height={100}
+                className="item-image"
+              />
+              {/* Details on the right */}
+              <div className="item-details">
+                <h3 className="item-name">{item.name}</h3>
+                <p className="item-description">{item.description}</p>
+                <p className="item-price">${item.price.toFixed(2)}</p>
+                <button
+                  onClick={() => handleEditItem(item.id)}
+                  className="button edit-button"
+                >
+                  Edit Item
+                </button>
+              </div>
+            </div>
           </li>
         ))}
       </ul>

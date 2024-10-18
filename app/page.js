@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { OrderContext } from '../contexts/OrderContext';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
@@ -11,10 +12,10 @@ export default function Menu() {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const menuId = 2; // Replace with logic to select the active menu
-
+  
   // Use the order context
   const { order, addItem } = useContext(OrderContext);
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
     // Fetch categories
@@ -63,6 +64,11 @@ export default function Menu() {
     addItem(item);
   };
 
+  // **New function to handle editing**
+  const handleEditItem = (id) => {
+    router.push(`/edititem?id=${id}`);
+  };
+
   // Calculate total quantity in the order
   const orderCount = order.reduce((total, item) => total + item.quantity, 0);
 
@@ -108,19 +114,31 @@ export default function Menu() {
         <ul className="menu-list">
           {menuItems.map((item) => (
             <li key={item.id} className="menu-item">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                width={150}
-                height={150}
-                className="item-image"
-              />
-              <h2 className="item-name">{item.name}</h2>
-              <p className="item-description">{item.description}</p>
-              <p className="item-price">${item.price.toFixed(2)}</p>
-              <button onClick={() => handleAddToOrder(item)} className="button">
-                Add to Order
-              </button>
+              <div className="item-content">
+                {/* Image on the left */}
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  width={150}
+                  height={150}
+                  className="item-image"
+                />
+                {/* Details on the right */}
+                <div className="item-details">
+                  <h2 className="item-name">{item.name}</h2>
+                  <p className="item-description">{item.description}</p>
+                  <p className="item-price">${item.price.toFixed(2)}</p>
+                  <div className="item-buttons">
+                    <button onClick={() => handleAddToOrder(item)} className="button">
+                      Add to Order
+                    </button>
+                    {/* 'Edit Item' button */}
+                    <button onClick={() => handleEditItem(item.id)} className="button edit-button">
+                      Edit Item
+                    </button>
+                  </div>
+                </div>
+              </div>
             </li>
           ))}
         </ul>
