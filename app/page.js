@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import orderManager from '../utils/OrderManager';
+import { OrderContext } from '../contexts/OrderContext';
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [menuName, setMenuName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const menuId = 2; // Replace with logic to select the active menu
+
+  // Use the order context
+  const { order, addItem } = useContext(OrderContext);
 
   useEffect(() => {
     async function fetchMenuItems() {
@@ -20,7 +23,7 @@ export default function Menu() {
         console.log('Menu Data:', data); // Log the entire response
         if (data && Array.isArray(data.menuItems)) {
           setMenuItems(data.menuItems);
-          setMenuName(data.name || 'Menu'); // Set the menu name, default to 'Menu' if not provided
+          setMenuName(data.name || 'Menu');
         } else {
           console.error('Invalid menu data structure:', data);
         }
@@ -33,15 +36,17 @@ export default function Menu() {
     fetchMenuItems();
   }, [menuId]);
 
-  const addToOrder = (item) => {
-    orderManager.addItem(item);
-    // Optionally, update state or provide feedback to the user
+  const handleAddToOrder = (item) => {
+    addItem(item);
   };
+
+  // Calculate total quantity in the order
+  const orderCount = order.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="menu-page">
       <Link href="/checkout">
-        <button className="button">View Order ({orderManager.getOrder().length})</button>
+        <button className="button">View Order ({orderCount})</button>
       </Link>
 
       <Link href="/adminportal">
@@ -62,18 +67,16 @@ export default function Menu() {
               <h2 className="item-name">{item.name}</h2>
               <p className="item-description">{item.description}</p>
               <p className="item-price">${item.price.toFixed(2)}</p>
-              <button onClick={() => addToOrder(item)} className="button">
+              <button onClick={() => handleAddToOrder(item)} className="button">
                 Add to Order
               </button>
             </li>
           ))}
         </ul>
+      ) : isLoading ? (
+        <p>Loading menu items...</p>
       ) : (
-        isLoading ? (
-          <p>Loading menu items...</p>
-        ) : (
-          <p>No menu items available.</p>
-        )
+        <p>No menu items available.</p>
       )}
     </div>
   );

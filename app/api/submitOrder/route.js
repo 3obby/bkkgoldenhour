@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from 'path-to-your-prisma-instance';
+import prisma from '@prisma/client';
 
 export async function POST(request) {
   const orderItems = await request.json();

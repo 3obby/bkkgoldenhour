@@ -1,24 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import orderManager from '../../utils/OrderManager';
+import { useContext } from 'react';
+import { OrderContext } from '../../contexts/OrderContext';
 import Link from 'next/link';
 
 export default function Checkout() {
-  const [order, setOrder] = useState([]);
-
-  useEffect(() => {
-    setOrder(orderManager.getOrder());
-  }, []);
+  const { order, removeItem, submitOrder } = useContext(OrderContext);
 
   const handleRemoveItem = (itemId) => {
-    orderManager.removeItem(itemId);
-    setOrder(orderManager.getOrder());
+    removeItem(itemId);
   };
 
-  const handleSubmitOrder = () => {
-    orderManager.submitOrder();
-    setOrder([]);
+  const handleSubmitOrder = async () => {
+    await submitOrder();
+    // Optionally, navigate to a confirmation page or display a success message
   };
 
   return (
@@ -33,7 +28,7 @@ export default function Checkout() {
               <li key={item.id} className="order-item">
                 <h2 className="item-name">{item.name}</h2>
                 <p>Quantity: {item.quantity}</p>
-                <p>Price: ${item.price.toFixed(2)}</p>
+                <p>Price: ${(item.price * item.quantity).toFixed(2)}</p>
                 <button onClick={() => handleRemoveItem(item.id)} className="button">
                   Remove
                 </button>
