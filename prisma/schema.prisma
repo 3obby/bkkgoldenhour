@@ -8,32 +8,51 @@ generator client {
 }
 
 model Menu {
-  id             Int                 @id @default(autoincrement())
-  name           String
-  menuItemsOnMenu MenuItemOnMenu[]   // Define relation to join table
+  id              Int                 @id @default(autoincrement())
+  name            String
+  menuItemsOnMenu MenuItemOnMenu[]    // Relation to join table
 }
 
 model MenuItem {
-  id              Int                  @id @default(autoincrement())
-  name            String
-  description     String
-  price           Float
-  imageUrl        String
+  id                 Int                   @id @default(autoincrement())
+  name               String
+  description        String
+  price              Float
+  imageUrl           String
 
-  menuItemsOnMenu MenuItemOnMenu[]    // Define relation to join table
-  orderItems      OrderItem[]
+  menuItemsOnMenu    MenuItemOnMenu[]      // Relation to join table with Menu
+  orderItems         OrderItem[]
+  menuItemCategories MenuItemCategory[]    // New relation to join table with Category
 }
 
 model MenuItemOnMenu {
   menuId      Int
   menuItemId  Int
 
-  menu        Menu         @relation(fields: [menuId], references: [id])
-  menuItem    MenuItem     @relation(fields: [menuItemId], references: [id])
+  menu        Menu       @relation(fields: [menuId], references: [id])
+  menuItem    MenuItem   @relation(fields: [menuItemId], references: [id])
 
   @@id([menuId, menuItemId])
   @@index([menuId])
   @@index([menuItemId])
+}
+
+model Category {
+  id                 Int                   @id @default(autoincrement())
+  name               String                @unique
+  menuItemCategories MenuItemCategory[]    // Relation to join table with MenuItem
+}
+
+model MenuItemCategory {
+  menuItemId Int
+  categoryId Int
+
+  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id])
+  category   Category   @relation(fields: [categoryId], references: [id])
+
+  @@id([menuItemId, categoryId])
+  @@index([menuItemId])
+  @@index([categoryId])
 }
 
 model Order {

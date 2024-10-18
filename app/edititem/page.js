@@ -11,8 +11,29 @@ export default function EditItem() {
     image: null,
     imageUrl: '',
   });
+  const [existingCategories, setExistingCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState('');
   const [uploadStatus, setUploadStatus] = useState('idle'); // 'idle', 'uploading', 'success', 'error'
   const router = useRouter();
+
+  useEffect(() => {
+    // Fetch existing categories from the server
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setExistingCategories(data.categories);
+        } else {
+          console.error('Failed to fetch categories');
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -44,15 +65,22 @@ export default function EditItem() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Submit the item data, including the imageUrl from the upload
+    // Combine selected categories and new category
+    const categories = [...selectedCategories];
+    if (newCategory) {
+      categories.push(newCategory);
+    }
+
+    // Submit the item data, including the imageUrl and categories
     const response = await fetch('/api/admin/items', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: item.name,
         description: item.description,
-        price: item.price,
-        imageUrl: item.imageUrl, // Use the uploaded image URL
+        price: parseFloat(item.price),
+        imageUrl: item.imageUrl,
+        categories, // Include categories
       }),
     });
 
@@ -112,6 +140,38 @@ export default function EditItem() {
             <img src={item.imageUrl} alt="Uploaded" width={150} />
           </div>
         )}
+
+        {/* Category Selection */}
+        <div className="category-selection">
+          <label htmlFor="categories">Select Categories:</label>
+          <select
+            id="categories"
+            multiple
+            value={selectedCategories}
+            onChange={(e) =>
+              setSelectedCategories(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
+            }
+            className="select-categories"
+          >
+            {existingCategories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="new-category">Or add a new category:</label>
+          <input
+            type="text"
+            id="new-category"
+            placeholder="New Category"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            className="input-text"
+          />
+        </div>
 
         <button type="submit" disabled={uploadStatus !== 'success'} className="button">
           Save Item

@@ -9,21 +9,44 @@ export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [menuName, setMenuName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const menuId = 2; // Replace with logic to select the active menu
 
   // Use the order context
   const { order, addItem } = useContext(OrderContext);
 
   useEffect(() => {
+    // Fetch categories
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.categories);
+        } else {
+          console.error('Failed to fetch categories');
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     async function fetchMenuItems() {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/admin/menus/${menuId}`);
+        const url = selectedCategory
+          ? `/api/admin/menuitems?category=${encodeURIComponent(selectedCategory)}`
+          : `/api/admin/menuitems`;
+        const response = await fetch(url);
         const data = await response.json();
-        console.log('Menu Data:', data); // Log the entire response
-        if (data && Array.isArray(data.menuItems)) {
-          setMenuItems(data.menuItems);
-          setMenuName(data.name || 'Menu');
+
+        if (Array.isArray(data)) {
+          setMenuItems(data);
+          setMenuName('Menu'); // You can adjust this as needed
         } else {
           console.error('Invalid menu data structure:', data);
         }
@@ -34,7 +57,7 @@ export default function Menu() {
       }
     }
     fetchMenuItems();
-  }, [menuId]);
+  }, [selectedCategory]);
 
   const handleAddToOrder = (item) => {
     addItem(item);
@@ -45,14 +68,42 @@ export default function Menu() {
 
   return (
     <div className="menu-page">
-      <Link href="/checkout">
-        <button className="button">View Order ({orderCount})</button>
-      </Link>
+      <nav className="navbar">
+        <Link href="/adminportal">
+          <button className="button admin-button">Admin Portal</button>
+        </Link>
+        <Image
+          src="/images/euphoria.avif"
+          alt="Euphoria Logo"
+          width={200}
+          height={50}
+          className="main-title"
+        />
+        <Link href="/checkout">
+          <button className="button view-order-button">View Order ({orderCount})</button>
+        </Link>
+      </nav>
 
-      <Link href="/adminportal">
-        <button className="button admin-button">Admin Portal</button>
-      </Link>
       <h1 className="title">{menuName || 'Menu'}</h1>
+
+      {/* Category Filter */}
+      <div className="category-filter">
+        <label htmlFor="category-select">Filter by Category:</label>
+        <select
+          id="category-select"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="select-category"
+        >
+          <option value="">All Categories</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {menuItems && menuItems.length > 0 ? (
         <ul className="menu-list">
           {menuItems.map((item) => (
@@ -78,6 +129,24 @@ export default function Menu() {
       ) : (
         <p>No menu items available.</p>
       )}
+
+      <style jsx>{`
+        .navbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background-color: #ff1379;
+          padding: 10px 20px;
+        }
+        .navbar .main-title {
+          flex-grow: 1;
+          text-align: center;
+          margin: 0;
+        }
+        .navbar .button {
+          flex-shrink: 0;
+        }
+      `}</style>
     </div>
   );
 }
