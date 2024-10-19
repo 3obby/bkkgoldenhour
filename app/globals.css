@@ -18,7 +18,7 @@ body {
   font-family: 'Rubik', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #304432; /* Main webpage background set to black */
+  background-color: #19281a; /* Main webpage background set to black */
 }
 
 .title {
@@ -73,10 +73,21 @@ body {
   padding: 0;
 }
 
+/* Center the menu items within the menu list */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers items horizontally */
+  padding: 0; /* Optional: Remove default padding */
+  margin: 0 auto; /* Centers the list within its container */
+}
+
+/* Adjust menu-item styles */
 .menu-item {
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 30px;
+  width: 100%;
+  max-width: 400px; /* Adjust as needed */
+  padding: 20px; /* Move padding here from inline styles */
+  box-sizing: border-box; /* Ensure padding doesn't exceed max-width */
 }
 
 /* Item Content */
@@ -100,7 +111,7 @@ body {
   height: auto;
   display: block;
   /* Rounded top corners only */
-  border-top-left-radius: 200px;
+  border-top-left-radius: 4444px;
   border-top-right-radius: 200px;
   /* Fade effect at the bottom */
   mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
@@ -113,10 +124,14 @@ body {
   font-size: 2em;
   color: #FF1493; /* Neon pink */
   text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000; /* Black outline */
+    -2px -2px 2px #000,
+     2px -2px 2px #000,
+    -2px  2px 2px #000,
+     2px  2px 2px #000,
+    -3px -3px 3px rgba(0,0,0,0.5),
+     3px -3px 3px rgba(0,0,0,0.5),
+    -3px  3px 3px rgba(0,0,0,0.5),
+     3px  3px 3px rgba(0,0,0,0.5); /* More extreme and diffused black outline */
 }
 
 .item-description {
@@ -265,15 +280,8 @@ body {
   -webkit-appearance: none; /* Remove default arrow in Safari */
   outline: none;
   cursor: pointer;
-  font-family: 'Courier New', Courier, monospace; /* Monospace font for hackery feel */
+  font-family: 'Rubik', 'Courier New', Courier, monospace; /* Monospace font for hackery feel */
   position: relative;
-  /* Add slick transition effect */
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-}
-
-.select-category:hover {
-  background-color: #0a0a0a;
-  border-color: #00ff00; /* Slightly brighter green on hover */
 }
 
 .select-category option {

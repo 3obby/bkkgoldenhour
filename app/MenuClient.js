@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { OrderContext } from '../contexts/OrderContext';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import BackgroundCanvas from '@/components/BackgroundCanvas';
 
 export default function MenuClient({ categories, initialMenuItems }) {
   const [menuItems, setMenuItems] = useState(initialMenuItems);
@@ -95,6 +96,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
   return (
     <>
+    <BackgroundCanvas />
       <style jsx global>{`
         @font-face {
           font-family: 'Rubik';
@@ -116,11 +118,11 @@ export default function MenuClient({ categories, initialMenuItems }) {
                 className="select-category"
               >
                 <option value="">
-                ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯{icons[iconIndex]}
+                  ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯{icons[iconIndex]}
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
-                    {category.name}
+                    ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{category.name}
                   </option>
                 ))}
               </select>
@@ -167,52 +169,55 @@ export default function MenuClient({ categories, initialMenuItems }) {
       </nav>
 
       {/* Page Content */}
-      <div className="menu-page" style={{ paddingTop: '20px' }}>
+      <div className="menu-page">
         {/* Content wrapper */}
         <div className="content-wrapper" style={{ paddingTop: navbarHeight }}>
           {/* Menu Items */}
           {menuItems && menuItems.length > 0 ? (
             <ul className="menu-list">
               {menuItems.map((item) => (
-                <li key={item.id} className="menu-item" style={{ padding: '20px' }}>
-                  <div >
-                    {/* Image Container */}
-                    <div className="image-container">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        width={600}
-                        height={600}
-                        className="item-image" // Added className for styling
-                      />
-                      {/* Item Name Overlay */}
-                      <h1 className="item-name" style={{
-                       
-                        top: '10%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '100%',
-                        textAlign: 'center'
-                      }}>{item.name}</h1>
+                <li
+                  key={item.id}
+                  className="menu-item"
+                >
+                  {/* Image Container */}
+                  <div className="image-container">
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                      <div style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          width={600}
+                          height={600}
+                          className="item-image"
+                          style={{ width: '100%', height: 'auto' }}
+                        />
+                        {/* Item Name Overlay */}
+                        <h1 className="item-name" style={{
+                          position: 'absolute',
+                          top: '10%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '100%',
+                          textAlign: 'center'
+                        }}>{item.name}</h1>
+                      </div>
                     </div>
-                   
+    
                     {/* Footer with Price and Add Button */}
-                    <div className="item-footer" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                      
+                    <div className="item-footer" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%', transform: 'translateY(-50px)' }}>
                       <div className="item-description" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', height: '100%' }}>
                         <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
                       </div>
                       <div className="item-price-container">
                         <p className="item-price" style={{ fontSize: '1.2em' }}>{item.price}฿</p>
                         <button 
-                            // Start of Selection
                             onClick={() => handleAddToOrder(item)}
                             className="add-button centered-button"
-                      >
-                        ➕
-                      </button>
+                        >
+                          ➕
+                        </button>
                       </div>
-                      
                     </div>
                   </div>
                 </li>
@@ -226,4 +231,3 @@ export default function MenuClient({ categories, initialMenuItems }) {
     </>
   );
 }
-// No code needed at this insertion point.
