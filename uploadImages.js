@@ -22,9 +22,9 @@ async function uploadImageToS3(filePath, fileName) {
   // Read the image file
   const imageBuffer = fs.readFileSync(filePath);
 
-  // Optionally, optimize or resize the image
+  // Optimize and resize the image
   const optimizedImage = await sharp(imageBuffer)
-    // .resize(800, 600) // Uncomment and adjust if you want to resize
+    .resize({ height: 600, width: null, withoutEnlargement: true }) // Resize to 180px height, maintaining aspect ratio
     .toBuffer();
 
   // Generate a unique key for the image in S3

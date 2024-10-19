@@ -131,3 +131,52 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  background-color: #ff1379; /* Set navbar background color */
+}
+
+/* Logo Section */
+.logo-container {
+  flex: 2; /* Allocates 2/3 of the navbar width */
+  display: flex;
+  align-items: center;
+}
+
+.logo-container .main-title {
+  width: 100%;
+  /* Additional styling if needed */
+}
+
+/* Order Button Section */
+.order-button-container {
+  flex: 1; /* Allocates 1/3 of the navbar width */
+  display: flex;
+  justify-content: center;
+}
+
+.view-order-button {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  /* Add any additional styling to make the button more elegant */
+}
+
+.view-order-button img {
+  margin-right: 8px; /* Space between the cart icon and the order count */
+}
+
+.order-count {
+  font-size: 16px;
+  /* Additional styling for the order count number */
+}
+
+/* Optional hover effect for the button */
+.view-order-button:hover {
+  /* Add hover effects if desired */
+}

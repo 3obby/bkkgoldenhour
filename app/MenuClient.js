@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { OrderContext } from '../contexts/OrderContext';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export default function MenuClient({ categories, initialMenuItems }) {
   const [menuItems, setMenuItems] = useState(initialMenuItems);
@@ -42,23 +43,64 @@ export default function MenuClient({ categories, initialMenuItems }) {
   // Calculate total quantity in the order
   const orderCount = order.reduce((total, item) => total + item.quantity, 0);
 
+  // Implement handleAddToOrder function
+  const handleAddToOrder = (item) => {
+    addItem(item);
+  };
+
   return (
     <div className="menu-page">
       {/* Navbar */}
       <nav className="navbar">
-        
-        <Image
-  src="/images/euphoria.avif"
-  alt="Euphoria Logo"
-  width={200}
-  height={50}
-  priority={true}
-  className="main-title"
-  style={{ width: '200px', height: 'auto' }}
-/>
-        <Link href="/checkout">
-          <button className="button view-order-button">View Order ({orderCount})</button>
-        </Link>
+        {/* Logo Section */}
+        <div className="logo-container">
+          <Image
+            src="/images/euphoria.avif"
+            alt="Euphoria Logo"
+            width={200}
+            height={50}
+            priority={true}
+            className="main-title"
+            style={{ width: '200px', height: 'auto' }}
+          />
+        </div>
+        {/* View Order Button */}
+        {orderCount > 0 && (
+          <div className="order-button-container">
+            <Link href="/checkout">
+              <button className="cart-button">
+                <div className="cart-icon-wrapper" style={{ position: 'relative' }}>
+                  <img
+                    src="/images/shopping-cart.png"
+                    alt="Shopping Cart"
+                    className="cart-icon"
+                  />
+                  <span
+                    className="order-count"
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      color: 'gold',
+                      borderRadius: '50%',
+                      padding: '64px',
+                      fontSize: '24px',
+                      width: '64px',
+                      height: '64px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      textShadow:
+                        '-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black',
+                    }}
+                  >
+                    {orderCount}
+                  </span>
+                </div>
+              </button>
+            </Link>
+          </div>
+        )}
       </nav>
 
       <h1 className="title">Menu</h1>
@@ -88,13 +130,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
             <li key={item.id} className="menu-item">
               <div className="item-content">
                 {/* Image */}
-                <Image
-  src={item.imageUrl}
-  alt={item.name}
-  width={150}
-  height={150}
-  style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-/>
+                <Image src={item.imageUrl} alt={item.name} width={600} height={600} />
                 {/* Details */}
                 <div className="item-details">
                   <h2 className="item-name">{item.name}</h2>
