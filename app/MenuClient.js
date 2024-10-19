@@ -149,7 +149,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
                       left: '0',
                       color: 'gold',
                       borderRadius: '50%',
-                      fontSize: '24px',
+                      fontSize: '32px',
                       width: '50px',
                       height: '50px',
                       display: 'flex',
