@@ -4,7 +4,11 @@
     "name": "Crispy French Fries",
     "description": "Served with your choice of mayonnaise or ketchup",
     "price": 90,
-    "category": ["🍟🥖🍤"]
+    "category": ["🍟🥖🍤"],
+    "options": [
+      { "name": "Mayonnaise", "price": 0 },
+      { "name": "Ketchup", "price": 0 }
+    ]
   },
   {
     "fileName": "jakartastylechickensatay.webp",
@@ -78,9 +82,16 @@
   },
   {
     "fileName": "ribeyesteak.webp",
-    "name": "Rib Eye Steak (175g / 350g)",
+    "name": "Rib Eye Steak (175g)",
     "description": "Succulent pan seared rib eye steak served with velvety mashed potatoes, tender baby carrots, and a vibrant beetroot gel, with a side of black pepper sauce",
     "price": 200,
+    "category": ["🐟🍝🥩"]
+  },
+  {
+    "fileName": "ribeyesteak.webp",
+    "name": "Rib Eye Steak (350g)",
+    "description": "Succulent pan seared rib eye steak served with velvety mashed potatoes, tender baby carrots, and a vibrant beetroot gel, with a side of black pepper sauce",
+    "price": 380,
     "category": ["🐟🍝🥩"]
   },
   {

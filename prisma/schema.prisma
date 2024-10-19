@@ -8,29 +8,30 @@ generator client {
 }
 
 model Menu {
-  id              Int               @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   name            String
-  menuItemsOnMenu MenuItemOnMenu[]  // Relation to join table
+  menuItemsOnMenu MenuItemOnMenu[] // Relation to join table
 }
 
 model MenuItem {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  description        String
-  price              Float
-  imageUrl           String
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  imageUrl    String
 
-  menuItemsOnMenu    MenuItemOnMenu[]     // Relation to join table with Menu
+  menuItemsOnMenu    MenuItemOnMenu[] // Relation to join table with Menu
   orderItems         OrderItem[]
-  menuItemCategories MenuItemCategory[]   // Relation to join table with Category
+  menuItemCategories MenuItemCategory[] // Relation to join table with Category
+  menuItemOptions    MenuItemOption[] // Add this line
 }
 
 model MenuItemOnMenu {
-  menuId      Int
-  menuItemId  Int
+  menuId     Int
+  menuItemId Int
 
-  menu        Menu       @relation(fields: [menuId], references: [id])
-  menuItem    MenuItem   @relation(fields: [menuItemId], references: [id])
+  menu     Menu     @relation(fields: [menuId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
 
   @@id([menuId, menuItemId])
   @@index([menuId])
@@ -38,17 +39,17 @@ model MenuItemOnMenu {
 }
 
 model Category {
-  id                 Int                   @id @default(autoincrement())
-  name               String                @unique
-  menuItemCategories MenuItemCategory[]    // Relation to join table with MenuItem
+  id                 Int                @id @default(autoincrement())
+  name               String             @unique
+  menuItemCategories MenuItemCategory[] // Relation to join table with MenuItem
 }
 
 model MenuItemCategory {
   menuItemId Int
   categoryId Int
 
-  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id])
-  category   Category   @relation(fields: [categoryId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@id([menuItemId, categoryId])
   @@index([menuItemId])
@@ -56,19 +57,39 @@ model MenuItemCategory {
 }
 
 model Order {
-  id          Int          @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   orderItems  OrderItem[]
-  status      String       @default("pending")
-  createdAt   DateTime     @default(now())
-  tableNumber Int?         // Added optional table number
+  status      String      @default("pending")
+  createdAt   DateTime    @default(now())
+  tableNumber Int? // Added optional table number
 }
 
 model OrderItem {
-  id          Int          @id @default(autoincrement())
-  order       Order        @relation(fields: [orderId], references: [id])
-  orderId     Int
-  menuItem    MenuItem     @relation(fields: [menuItemId], references: [id])
-  menuItemId  Int
-  quantity    Int          @default(1)
-  comment     String?      // Added optional comment
+  id               Int               @id @default(autoincrement())
+  order            Order             @relation(fields: [orderId], references: [id])
+  orderId          Int
+  menuItem         MenuItem          @relation(fields: [menuItemId], references: [id])
+  menuItemId       Int
+  quantity         Int               @default(1)
+  comment          String? // Added optional comment
+  orderItemOptions OrderItemOption[]
+}
+
+model OrderItemOption {
+  id               Int @id @default(autoincrement())
+  orderItemId      Int
+  menuItemOptionId Int
+
+  orderItem      OrderItem      @relation(fields: [orderItemId], references: [id])
+  menuItemOption MenuItemOption @relation(fields: [menuItemOptionId], references: [id])
+}
+
+model MenuItemOption {
+  id         Int    @id @default(autoincrement())
+  name       String
+  price      Float
+  menuItemId Int
+
+  menuItem        MenuItem          @relation(fields: [menuItemId], references: [id])
+  OrderItemOption OrderItemOption[]
 }
