@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import localFont from "next/font/local";
 import "./globals.css";
 import { OrderProvider } from '../contexts/OrderContext'; // Adjust the path if necessary
+import Loading from './loading'; // Add this import
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,7 +28,9 @@ export default function RootLayout({ children }) {
       >
         {/* Wrap your application with OrderProvider */}
         <OrderProvider>
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          <Suspense fallback={<Loading />}>
+            {children}
+          </Suspense>
         </OrderProvider>
       </body>
     </html>

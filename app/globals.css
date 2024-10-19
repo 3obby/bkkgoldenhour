@@ -18,7 +18,7 @@ body {
   font-family: 'Rubik', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #000000; /* Main webpage background set to black */
+  background-color: #304432; /* Main webpage background set to black */
 }
 
 .title {
@@ -100,8 +100,8 @@ body {
   height: auto;
   display: block;
   /* Rounded top corners only */
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 200px;
+  border-top-right-radius: 200px;
   /* Fade effect at the bottom */
   mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
@@ -120,7 +120,7 @@ body {
 }
 
 .item-description {
-  margin-top: -60px; /* Adjust to overlap image fade */
+  
   padding: 20px;
   background-color: transparent;
   color: #ffffff; /* Changed text color to white */
@@ -138,13 +138,14 @@ body {
 .item-price {
   font-size: 1.5em;
   font-weight: bold;
-  color: white; /* Make the price text white */
+  color: white;
+  text-align: center;
 }
 
 .add-button {
   width: 50px;
   height: 50px;
-  background-color: #ffffff;
+  background-color: #ff1493;
   border: none;
   border-radius: 50%;
   font-size: 2em;
@@ -245,11 +246,6 @@ body {
   /* Additional styling for the order count number */
 }
 
-/* Optional hover effect for the button */
-.view-order-button:hover {
-  /* Add hover effects if desired */
-}
-
 /* Matrix-style Category Filter */
 .category-filter.matrix-style {
   margin: 20px auto; /* Center horizontally with vertical spacing */
@@ -303,4 +299,73 @@ body {
 /* Content wrapper */
 .content-wrapper {
   padding-top: 120px; /* Adjust this value based on your navbar's height */
+}
+
+/* Add the following keyframes */
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutLogo {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Add the following classes */
+.logo-fade-in {
+  animation: fadeInLogo 1.5s forwards;
+}
+
+.logo-fade-out {
+  animation: fadeOutLogo 1s forwards;
+  animation-delay: 3.5s; /* 1.5s fade-in + 2s stay */
+}
+
+.logo-animation {
+  animation: fadeInLogo 1.5s forwards, fadeOutLogo 1s forwards 3.5s;
+}
+
+/* Fade In and Fade Out Animations */
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOutLogo {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fadeInLogo 1.5s forwards;
+}
+
+.fade-out {
+  animation: fadeOutLogo 1s forwards;
+  animation-delay: 3s; /* Adjust timing as needed */
+}
+
+/* Center the loading container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
 }

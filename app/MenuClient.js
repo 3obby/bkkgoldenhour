@@ -12,7 +12,6 @@ export default function MenuClient({ categories, initialMenuItems }) {
   const [selectedCategory, setSelectedCategory] = useState('');
   const { order, addItem } = useContext(OrderContext);
   const router = useRouter();
-  const [showLogo, setShowLogo] = useState(true);
 
   // State and references for icon animation
   const [iconIndex, setIconIndex] = useState(0);
@@ -64,8 +63,8 @@ export default function MenuClient({ categories, initialMenuItems }) {
       setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
 
       // Calculate new delay for cyclic timing (fast to slow to fast)
-      const maxDelay = 1000; // Maximum delay in ms
-      const minDelay = 200;  // Minimum delay in ms
+      const maxDelay = 300; // Maximum delay in ms
+      const minDelay = 3;  // Minimum delay in ms
       const period = 5000;   // Full cycle period in ms
       const time = Date.now() % period;
       const sineValue = Math.sin((2 * Math.PI * time) / period); // Ranges from -1 to 1
@@ -85,14 +84,6 @@ export default function MenuClient({ categories, initialMenuItems }) {
     };
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLogo(false);
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const navbarRef = useRef(null);
   const [navbarHeight, setNavbarHeight] = useState(0);
 
@@ -100,7 +91,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
     if (navbarRef.current) {
       setNavbarHeight(navbarRef.current.offsetHeight);
     }
-  }, [showLogo, orderCount]); // Recalculate if navbar height might change
+  }, [orderCount]); // Recalculate if navbar height might change
 
   return (
     <>
@@ -115,24 +106,9 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
       {/* Navbar */}
       <nav className="navbar" ref={navbarRef}>
-        {/* Logo Section or Category Filter */}
+        {/* Logo Section */}
         <div className="logo-container">
-          {showLogo ? (
-            <Image
-              src="/images/euphoria.avif"
-              alt="Euphoria Logo"
-              width={200}
-              height={50}
-              priority={true}
-              className="main-title"
-              style={{
-                width: '200px',
-                height: 'auto',
-                filter: 'invert(39%) sepia(60%) saturate(2163%) hue-rotate(312deg) brightness(100%) contrast(101%)',
-              }}
-            />
-          ) : (
-            <div className="category-filter matrix-style">
+        <div className="category-filter matrix-style">
               <select
                 id="category-select"
                 value={selectedCategory}
@@ -140,7 +116,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
                 className="select-category"
               >
                 <option value="">
-                ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯{icons[iconIndex]}
+                ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯{icons[iconIndex]}
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
@@ -149,7 +125,6 @@ export default function MenuClient({ categories, initialMenuItems }) {
                 ))}
               </select>
             </div>
-          )}
         </div>
         {/* View Order Button */}
         {orderCount > 0 && (
@@ -199,8 +174,8 @@ export default function MenuClient({ categories, initialMenuItems }) {
           {menuItems && menuItems.length > 0 ? (
             <ul className="menu-list">
               {menuItems.map((item) => (
-                <li key={item.id} className="menu-item">
-                  <div className="item-content">
+                <li key={item.id} className="menu-item" style={{ padding: '20px' }}>
+                  <div >
                     {/* Image Container */}
                     <div className="image-container">
                       <Image
@@ -211,16 +186,33 @@ export default function MenuClient({ categories, initialMenuItems }) {
                         className="item-image" // Added className for styling
                       />
                       {/* Item Name Overlay */}
-                      <h2 className="item-name">{item.name}</h2> {/* Moved inside image-container */}
+                      <h1 className="item-name" style={{
+                       
+                        top: '10%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '100%',
+                        textAlign: 'center'
+                      }}>{item.name}</h1>
                     </div>
-                    {/* Description */}
-                    <p className="item-description">{item.description}</p>
+                   
                     {/* Footer with Price and Add Button */}
-                    <div className="item-footer">
-                      <p className="item-price">${item.price.toFixed(2)}</p>
-                      <button onClick={() => handleAddToOrder(item)} className="add-button">
+                    <div className="item-footer" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                      
+                      <div className="item-description" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', height: '100%' }}>
+                        <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
+                      </div>
+                      <div className="item-price-container">
+                        <p className="item-price" style={{ fontSize: '1.2em' }}>{item.price}฿</p>
+                        <button 
+                            // Start of Selection
+                            onClick={() => handleAddToOrder(item)}
+                            className="add-button centered-button"
+                      >
                         ➕
                       </button>
+                      </div>
+                      
                     </div>
                   </div>
                 </li>
@@ -234,3 +226,4 @@ export default function MenuClient({ categories, initialMenuItems }) {
     </>
   );
 }
+// No code needed at this insertion point.
