@@ -46,17 +46,16 @@ export default function MenuClient({ categories, initialMenuItems }) {
     <div className="menu-page">
       {/* Navbar */}
       <nav className="navbar">
-        <Link href="/adminportal">
-          <button className="button admin-button">Admin Portal</button>
-        </Link>
+        
         <Image
-          src="/images/euphoria.avif"
-          alt="Euphoria Logo"
-          width={200}
-          height={50}
-          priority={true}
-          className="main-title"
-        />
+  src="/images/euphoria.avif"
+  alt="Euphoria Logo"
+  width={200}
+  height={50}
+  priority={true}
+  className="main-title"
+  style={{ width: '200px', height: 'auto' }}
+/>
         <Link href="/checkout">
           <button className="button view-order-button">View Order ({orderCount})</button>
         </Link>
@@ -90,13 +89,12 @@ export default function MenuClient({ categories, initialMenuItems }) {
               <div className="item-content">
                 {/* Image */}
                 <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  width={150}
-                  height={150}
-                  className="item-image"
-                  blurDataURL="/images/placeholder.png"
-                />
+  src={item.imageUrl}
+  alt={item.name}
+  width={150}
+  height={150}
+  style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+/>
                 {/* Details */}
                 <div className="item-details">
                   <h2 className="item-name">{item.name}</h2>

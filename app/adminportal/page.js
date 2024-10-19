@@ -97,8 +97,8 @@ export default function AdminPortal() {
               <Image
                 src={item.imageUrl}
                 alt={item.name}
-                width={100}
-                height={100}
+                width={140}
+                height={140}
                 className="item-image"
               />
               {/* Details on the right */}

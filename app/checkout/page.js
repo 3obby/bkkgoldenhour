@@ -66,6 +66,9 @@ export default function Checkout() {
       <Link href="/">
         <button className="button">Back to Menu</button>
       </Link>
+      <Link href="/adminportal">
+          <button className="button admin-button">Admin Portal</button>
+        </Link>
     </div>
   );
 }

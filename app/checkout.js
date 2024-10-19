@@ -16,6 +16,11 @@ export default function Checkout() {
       <h1>Checkout</h1>
       {/* Display order summary */}
       <button onClick={handleSubmitOrder}>Confirm Order</button>
+      <br />
+
+      <Link href="/adminportal">
+          <button className="button admin-button">Admin Portal</button>
+        </Link>
     </div>
   );
 }
