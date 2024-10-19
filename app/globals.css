@@ -15,10 +15,10 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Rubik', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: #000000; /* Main webpage background set to black */
 }
 
 .title {
@@ -38,7 +38,7 @@ body {
 .menu-page {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px; /* Remove top padding */
 }
 
 .input-text,
@@ -74,23 +74,85 @@ body {
 }
 
 .menu-item {
-  background-color: white;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+/* Item Content */
+.item-content {
+  position: relative;
+  transition: box-shadow 0.3s ease; /* Smooth transition on hover */
+}
+
+/* Pink neon glow on hover */
+.item-content:hover {
+  box-shadow: 5px 5px 20px 5px #ff1493; /* Pink neon glow diffused to bottom right */
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+}
+
+.item-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* Rounded top corners only */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  /* Fade effect at the bottom */
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
 .item-name {
-  font-size: 1.5em;
-  margin: 10px 0;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 2em;
+  color: #FF1493; /* Neon pink */
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000; /* Black outline */
 }
 
 .item-description {
-  color: #666;
+  margin-top: -60px; /* Adjust to overlap image fade */
+  padding: 20px;
+  background-color: transparent;
+  color: #ffffff; /* Changed text color to white */
+  font-size: 1.2em; /* Increased font size */
+  position: relative; /* Add this line */
+  z-index: 2;        /* Add this line to bring it above the gradient */
+}
+
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Ensure items are centered vertically */
 }
 
 .item-price {
+  font-size: 1.5em;
   font-weight: bold;
+  color: white; /* Make the price text white */
+}
+
+.add-button {
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #f0f0f0;
 }
 
 .status {
@@ -136,7 +198,14 @@ body {
 .navbar {
   display: flex;
   align-items: center;
-  background-color: #ff1379; /* Set navbar background color */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #ffffff1f; /* or any color you prefer */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* optional: adds a subtle shadow */
+  padding: 10px 20px; /* Added padding for spacing inside the navbar */
 }
 
 /* Logo Section */
@@ -179,4 +248,59 @@ body {
 /* Optional hover effect for the button */
 .view-order-button:hover {
   /* Add hover effects if desired */
+}
+
+/* Matrix-style Category Filter */
+.category-filter.matrix-style {
+  margin: 20px auto; /* Center horizontally with vertical spacing */
+  display: flex;
+  align-items: center; /* Center content vertically */
+  justify-content: center;
+}
+
+.select-category {
+  padding: 12px 20px;
+  font-size: 1.2em;
+  /* Black background */
+ /* Neon green border */
+  border-radius: 4px;
+  text-align: center;
+  appearance: none; /* Remove default arrow */
+  -webkit-appearance: none; /* Remove default arrow in Safari */
+  outline: none;
+  cursor: pointer;
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for hackery feel */
+  position: relative;
+  /* Add slick transition effect */
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.select-category:hover {
+  background-color: #0a0a0a;
+  border-color: #00ff00; /* Slightly brighter green on hover */
+}
+
+.select-category option {
+  background-color: #000000; /* Black background for options */
+  color: #39ff14; /* Neon green text */
+}
+
+/* Custom arrow using CSS */
+.select-category::after {
+  content: '';
+  position: absolute;
+  right: 15px;
+  pointer-events: none;
+  color: #39ff14;
+  font-size: 1em;
+}
+
+/* For browsers that don't support appearance: none */
+.select-category:-ms-expand {
+  display: none;
+}
+
+/* Content wrapper */
+.content-wrapper {
+  padding-top: 120px; /* Adjust this value based on your navbar's height */
 }
