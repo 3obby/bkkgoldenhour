@@ -44,7 +44,7 @@ export const OrderProvider = ({ children }) => {
     localStorage.removeItem(orderKey);
   };
 
-  const submitOrder = async (tableNumber, comments, selectedOptions) => {
+  const submitOrder = async (tableNumber, comments, selectedOptions, customerId) => {
     try {
       const orderData = order.map((item) => ({
         ...item,
@@ -55,7 +55,11 @@ export const OrderProvider = ({ children }) => {
       const response = await fetch('/api/submitOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderItems: orderData, tableNumber }),
+        body: JSON.stringify({
+          orderItems: orderData,
+          tableNumber,
+          customerId, // Include customerId here
+        }),
       });
       const data = await response.json();
       console.log('Order submitted:', data);

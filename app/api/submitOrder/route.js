@@ -4,13 +4,21 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function POST(request) {
-  const { orderItems, tableNumber } = await request.json();
+  const { orderItems, tableNumber, customerId } = await request.json();
 
   try {
     const order = await prisma.order.create({
       data: {
         status: 'pending',
         tableNumber: tableNumber ? parseInt(tableNumber) : null,
+        customer: customerId
+          ? {
+              connectOrCreate: {
+                where: { id: customerId },
+                create: { id: customerId },
+              },
+            }
+          : undefined,
         orderItems: {
           create: orderItems.map((item) => ({
             menuItemId: item.id,

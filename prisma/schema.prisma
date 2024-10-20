@@ -56,12 +56,21 @@ model MenuItemCategory {
   @@index([categoryId])
 }
 
+model Customer {
+  id           String  @id @default(uuid())
+  customerIcon String? // Added optional customerIcon field
+  orders       Order[]
+}
+
 model Order {
-  id          Int         @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
+  status      String    @default("pending")
+  createdAt   DateTime  @default(now())
+  tableNumber Int?
+  customerId  String?   // Add this line
+  customer    Customer? @relation(fields: [customerId], references: [id])
+
   orderItems  OrderItem[]
-  status      String      @default("pending")
-  createdAt   DateTime    @default(now())
-  tableNumber Int? // Added optional table number
 }
 
 model OrderItem {

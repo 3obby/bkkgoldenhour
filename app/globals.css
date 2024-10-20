@@ -19,6 +19,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #19281a; /* Main webpage background set to black */
+  position: relative;
 }
 
 .title {
@@ -159,18 +160,19 @@ body {
 }
 
 .add-button {
-  width: 50px;
-  height: 50px;
-  background-color: #ff1493;
+  background-color: #28a745; /* Initial color */
+  color: white;
   border: none;
   border-radius: 50%;
+  width: 50px;
+  height: 50px;
   font-size: 2em;
   cursor: pointer;
-  color: black; /* Added to make all text in the button black */
+  transition: background-color 0.3s;
 }
 
 .add-button:hover {
-  background-color: #f0f0f0;
+  background-color: #5cb85c;
 }
 
 .status {
@@ -367,7 +369,6 @@ body {
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
 }
 
 .nav-button {
@@ -419,31 +420,51 @@ body {
   list-style: none;
   padding: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center child elements horizontally */
 }
 
 /* Order item row - new layout */
 .order-item-row-new {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   margin-bottom: 20px;
+  width: 100%; /* Make it take up 100% width */
 }
 
-/* Order item info row */
-.order-item-info-new {
+/* New styles for the order item content */
+.order-item-content {
   display: flex;
   align-items: center;
-  justify-content: center;
+  width: 100%; /* Ensure full width */
 }
 
-/* Remove button */
+/* Item info styling */
+.item-info {
+  display: flex;
+  align-items: center;
+  width: 87.5%; /* 7/8th of the width */
+}
+
+/* Remove button styling */
 .remove-button-new {
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
   color: red;
-  margin-right: 15px;
+  width: 12.5%; /* 1/8th of the width */
+  text-align: center; /* Center the 'X' within the button */
+}
+
+/* Order item info row */
+.order-item-info-new {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align content to the right */
+  width: 100%; /* Ensure full width */
 }
 
 /* Item quantity */
@@ -455,8 +476,8 @@ body {
 
 /* Item name */
 .item-name-new {
+  text-align: right;
   font-size: 24px;
-  margin-right: 10px;
   color: gold;
   text-shadow:
     -1px -1px 0 black,
@@ -469,15 +490,14 @@ body {
 .item-price-new {
   font-size: 24px;
   color: white;
+  margin-top: 10px;
+  text-align: right; /* Align text to the right */
+  width: 100%; /* Ensure it spans full width */
 }
 
 /* Options container */
 .options-container-new {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: 10px;
-  width: 80%;
+  width: 100%; /* Ensure full width */
 }
 
 /* Option label */
@@ -515,14 +535,132 @@ body {
   display: flex;
   justify-content: center;
   margin-top: 30px;
+  position: relative;
+}
+
+/* Style for the spawned effect */
+.button-click-effect {
+  position: fixed;
+  /* Left and top will be set inline from the component */
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: gray;
+  z-index: 1000;
+  animation: buttonClickEffectAnimation var(--speed) forwards;
+  animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
+  pointer-events: none; /* So it doesn't block clicks */
+}
+
+/* Revised keyframes for the smooth parabolic arc animation */
+@keyframes buttonClickEffectAnimation {
+  0% {
+    transform: translate(-50%, -50%) translate(0px, 0px)
+      translate(0px, 0px)
+      rotate(0deg)
+      scale(1);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(-50%, -50%) translate(calc(0.1 * var(--x-distance)), -80px)
+      rotate(36deg)
+      scale(1.05);
+  }
+  20% {
+    transform: translate(-50%, -50%) translate(calc(0.2 * var(--x-distance)), -140px)
+      rotate(72deg)
+      scale(1.1);
+  }
+  30% {
+    transform: translate(-50%, -50%) translate(calc(0.3 * var(--x-distance)), -180px)
+      rotate(108deg)
+      scale(1.15);
+  }
+  40% {
+    transform: translate(-50%, -50%) translate(calc(0.4 * var(--x-distance)), -200px)
+      rotate(144deg)
+      scale(1.2);
+  }
+  50% {
+    transform: translate(-50%, -50%) translate(calc(0.5 * var(--x-distance)), -210px)
+      rotate(180deg)
+      scale(1.25);
+  }
+  60% {
+    transform: translate(-50%, -50%) translate(calc(0.6 * var(--x-distance)), -200px)
+      rotate(216deg)
+      scale(1.2);
+  }
+  70% {
+    transform: translate(-50%, -50%) translate(calc(0.7 * var(--x-distance)), -180px)
+      rotate(252deg)
+      scale(1.15);
+  }
+  80% {
+    transform: translate(-50%, -50%) translate(calc(0.8 * var(--x-distance)), -140px)
+      rotate(288deg)
+      scale(1.1);
+  }
+  90% {
+    transform: translate(-50%, -50%) translate(calc(0.9 * var(--x-distance)), -80px)
+      rotate(324deg)
+      scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--x-distance), 0px)
+      rotate(360deg)
+      scale(1);
+    opacity: 0;
+  }
+}
+
+/* Animation for the add-button when clicked */
+.add-button.clicked {
+  animation: addButtonClickAnimation 0.2s;
+}
+
+@keyframes addButtonClickAnimation {
+  0% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
+  50% {
+    transform: scale(1.2);
+    background-color: #5cb85c;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
+}
+
+/* Submit button click animation */
+.submit-button-new.clicked {
+  animation: buttonActiveAnimation 0.2s;
+}
+
+@keyframes buttonActiveAnimation {
+  0% {
+    transform: scale(1) rotate(0deg);
+    background-color: #37c019;
+  }
+  50% {
+    transform: scale(1.1) rotate(-10deg);
+    background-color: #4cff1d;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    background-color: #37c019;
+  }
 }
 
 /* Submit button */
 .submit-button-new {
-  background-color: pink;
-  border: none;
-  border-radius: 50px;
-  padding: 20px 40px;
+  background: linear-gradient(45deg, #37c019, #3fab1e, #467a3b, #196b21);
+  background-size: 300% 300%;
+  border-radius: 100%;
+  padding: 20px 20px;
   font-size: 48px;
   cursor: pointer;
   color: white;
@@ -531,6 +669,70 @@ body {
      2px -2px 0 #ff1493,
     -2px 2px 0 #ff1493,
      2px 2px 0 #ff1493;
+  
+  /* Updated animation */
+  animation: submitButtonAnimation 4s infinite;
+  position: relative; /* Required for the spinning glow effect */
+  transform-origin: center; /* Ensure rotation occurs around the center */
+}
+
+/* New keyframes for the button animation */
+@keyframes submitButtonAnimation {
+  0% {
+    transform: scale(1) rotate(0deg);
+    box-shadow:
+      0 0 10px #39ff14,
+      0 0 20px #39ff14,
+      0 0 30px #39ff14,
+      0 0 40px #39ff14,
+      inset 0 0 10px #39ff14,
+      inset 0 0 20px #39ff14,
+      inset 0 0 30px #39ff14;
+  }
+  25% {
+    transform: scale(1.05) rotate(-5deg);
+    box-shadow:
+      0 0 15px #39ff14,
+      0 0 25px #39ff14,
+      0 0 35px #39ff14,
+      0 0 45px #39ff14,
+      inset 0 0 15px #39ff14,
+      inset 0 0 25px #39ff14,
+      inset 0 0 35px #39ff14;
+  }
+  50% {
+    transform: scale(1.1) rotate(0deg);
+    box-shadow:
+      0 0 20px #39ff14,
+      0 0 30px #39ff14,
+      0 0 40px #39ff14,
+      0 0 50px #39ff14,
+      inset 0 0 20px #39ff14,
+      inset 0 0 30px #39ff14,
+      inset 0 0 40px #39ff14;
+  }
+  75% {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow:
+      0 0 15px #39ff14,
+      0 0 25px #39ff14,
+      0 0 35px #39ff14,
+      0 0 45px #39ff14,
+      inset 0 0 15px #39ff14,
+      inset 0 0 25px #39ff14,
+      inset 0 0 35px #39ff14;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    box-shadow:
+      0 0 10px #39ff14,
+      0 0 20px #39ff14,
+      0 0 30px #39ff14,
+      0 0 40px #39ff14,
+      inset 0 0 10px #39ff14,
+      inset 0 0 20px #39ff14,
+      inset 0 0 30px #39ff14;
+  }
 }
 
 /* Adjust font sizes for better visibility */
@@ -544,4 +746,469 @@ body {
 .checkout-page-new {
   min-height: 100vh;
   justify-content: center;
+}
+
+.orders-page {
+  text-align: center;
+  color: white;
+}
+
+.orders-title {
+  font-size: 2em;
+  margin-top: 20px;
+}
+
+.orders-loading,
+.orders-empty {
+  font-size: 1.5em;
+  color: white;
+}
+
+.orders-list {
+  list-style: none;
+  padding: 0;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.complete-button {
+  background: none;
+  border: none;
+  font-size: 2em;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.order-content {
+  text-align: left;
+}
+
+.loading-animation {
+  font-size: 1em;
+  color: white;
+}
+
+.order-items-list {
+  list-style: none;
+  padding: 0;
+  margin-left: 20px; /* Indent the items list */
+}
+
+.order-item-detail {
+  margin-bottom: 10px;
+}
+
+.order-item-detail p {
+  margin: 5px 0;
+  color: white;
+  font-size: 1.2em;
+}
+
+.order-item-options {
+  list-style: none;
+  padding-left: 15px;
+}
+
+.order-item-options li {
+  font-size: 1em;
+  color: #ccc;
+}
+
+.order-content h2,
+.order-content h3 {
+  color: white;
+}
+
+.order-content p {
+  color: white;
+}
+
+/* Navbar Styling */
+.orders-navbar {
+  display: flex;
+  justify-content: center;
+}
+
+.toggle-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.toggle-button:hover {
+  background-color: #005bb5;
+}
+
+/* Gold Text Styling */
+.gold-text {
+  color: gold;
+}
+
+/* Customer Group Styling */
+.customer-group {
+  border: 2px solid white;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.customer-icon {
+  font-size: 3em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Adjusted Orders List for Div Container */
+.orders-list {
+  /* Changed from 'ul' styles to accommodate 'div' */
+  padding: 0;
+}
+
+/* Past Orders Section Styling */
+.past-orders {
+  color: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.past-orders h2 {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+}
+
+.past-order {
+  display: flex;
+  flex-direction: column; /* Stack child elements vertically */
+  align-items: center;    /* Center child elements horizontally */
+  margin-bottom: 5px;
+  width: 100%; /* Make past-order 100% wide */
+}
+
+.past-order p {
+  margin: 0;
+  font-size: 18px;
+}
+
+.past-order .chef-icon {
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+/* Past Orders Items Styling */
+.past-order-items {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Left-align items */
+  width: 100%;            /* Make items span full width */
+}
+
+.past-order-items li {
+  font-size: 16px;
+  color: black;
+}
+
+.order-status-card {
+  /* existing styles */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Centers content vertically */
+}
+
+.cart-icon-container {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  margin: 0 auto;
+}
+
+.order-count {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: gold;
+  font-size: 64px;
+  width: 128px;
+  height: 128px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+}
+
+/* Background colors based on status */
+.past-order.pending,
+.past-order.in-progress {
+  background-color: yellow;
+}
+
+.past-order.completed {
+  background-color: green;
+}
+
+.loading-animation {
+  font-size: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: hourglass-animation 2s infinite;
+}
+
+/* Keyframes for the hourglass animation */
+@keyframes hourglass-animation {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(15deg) scale(1.2);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-15deg) scale(0.8);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.comment-toggle-button {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  margin-left: 10px; /* Adjust spacing as needed */
+}
+
+/* Styled card for the order list and submit button */
+.order-card {
+  background: linear-gradient(85deg, 
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.1) 5%,
+    rgba(255, 255, 255, 0.05) 10%,
+    rgba(255, 255, 255, 0.02) 20%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.02) 80%,
+    rgba(255, 255, 255, 0.05) 90%,
+    rgba(255, 255, 255, 0.1) 95%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 30%;
+    left: -10%;
+    width: 120%;
+    height: 40%;
+    background: linear-gradient(to right, 
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.07) 3%,
+      rgba(255, 255, 255, 0) 16%
+    );
+    transform: rotate(-5deg);
+  }
+  padding: 20px;
+  border-radius: 0px; /* Square edges */
+  width: 90%;         /* Optional: Adjust width as needed */
+  margin: 20px auto;  /* Center the card with vertical spacing */
+}
+
+/* Gamertag styling */
+.gamertag {
+  display: flex;
+  align-items: center;
+  background-color: #2d2d2d; /* Dark background for the gamertag */
+  border-radius: 0 0 25px 25px;       /* Rounded-pill shape with flat top */
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.gamertag-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #808080; /* Grey background for the emoji */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;        /* Circular shape */
+  font-size: 2em;
+  margin-right: 15px;
+}
+
+.gamertag-text {
+  font-size: 1.5em;          /* Big text for 'Anon:' and user ID */
+}
+
+/* Loading gamertag styling */
+.gamertag-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px; /* Set a height similar to the gamertag */
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  font-size: 1.5em;
+  color: white;
+}
+
+/* Make submit-button-container-new position: relative */
+.submit-button-container-new {
+  /* ... existing styles ... */
+  position: relative;
+}
+
+/* Style for the spawned effect */
+.button-click-effect {
+  position: fixed;
+  /* Left and top will be set inline from the component */
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: gray;
+  z-index: 1000;
+  animation: buttonClickEffectAnimation var(--speed) forwards;
+  animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
+  pointer-events: none; /* So it doesn't block clicks */
+}
+
+/* Keyframes for the parabolic arc animation */
+@keyframes buttonClickEffectAnimation {
+  0% {
+    transform: translate(-50%, -50%) translate(0px, 0px)
+      translate(0px, 0px)
+      rotate(0deg)
+      scale(1);
+    opacity: 1;
+  }
+  10% {
+    transform: translate(-50%, -50%) translate(calc(0.1 * var(--x-distance)), -80px)
+      rotate(36deg)
+      scale(1.05);
+  }
+  20% {
+    transform: translate(-50%, -50%) translate(calc(0.2 * var(--x-distance)), -140px)
+      rotate(72deg)
+      scale(1.1);
+  }
+  30% {
+    transform: translate(-50%, -50%) translate(calc(0.3 * var(--x-distance)), -180px)
+      rotate(108deg)
+      scale(1.15);
+  }
+  40% {
+    transform: translate(-50%, -50%) translate(calc(0.4 * var(--x-distance)), -200px)
+      rotate(144deg)
+      scale(1.2);
+  }
+  50% {
+    transform: translate(-50%, -50%) translate(calc(0.5 * var(--x-distance)), -210px)
+      rotate(180deg)
+      scale(1.25);
+  }
+  60% {
+    transform: translate(-50%, -50%) translate(calc(0.6 * var(--x-distance)), -200px)
+      rotate(216deg)
+      scale(1.2);
+  }
+  70% {
+    transform: translate(-50%, -50%) translate(calc(0.7 * var(--x-distance)), -180px)
+      rotate(252deg)
+      scale(1.15);
+  }
+  80% {
+    transform: translate(-50%, -50%) translate(calc(0.8 * var(--x-distance)), -140px)
+      rotate(288deg)
+      scale(1.1);
+  }
+  90% {
+    transform: translate(-50%, -50%) translate(calc(0.9 * var(--x-distance)), -80px)
+      rotate(324deg)
+      scale(1.05);
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--x-distance), 0px)
+      rotate(360deg)
+      scale(1);
+    opacity: 0;
+  }
+}
+
+/* Animation for the add-button when clicked */
+.add-button.clicked {
+  animation: addButtonClickAnimation 0.2s;
+}
+
+@keyframes addButtonClickAnimation {
+  0% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
+  50% {
+    transform: scale(1.2);
+    background-color: #5cb85c;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #28a745;
+  }
+}
+
+/* Optional: Change the add-button styles */
+.add-button {
+  background-color: #28a745; /* Initial color */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 2em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #5cb85c;
+}
+
+/* ... existing styles ... */
+
+/* New CSS classes for button click animations */
+.cart-button-responsive {
+  transition: transform 0.3s;
+}
+
+.cart-button-responsive.clicked {
+  animation: cartButtonClickAnimation 0.5s;
+}
+
+@keyframes cartButtonClickAnimation {
+  0% {
+    transform: scale(1.2) rotate(-15deg);
+  }
+  50% {
+    transform: scale(1) rotate(15deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
 }
