@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import localFont from "next/font/local";
 import "./globals.css";
-import { OrderProvider } from '../contexts/OrderContext'; // Adjust the path if necessary
+import ClientProviders from '../components/ClientProviders'; // Adjust the path if necessary
 import Loading from './loading'; // Add this import
 
 const geistSans = localFont({
@@ -26,12 +26,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Wrap your application with OrderProvider */}
-        <OrderProvider>
+        {/* Wrap your application with ClientProviders */}
+        <ClientProviders>
           <Suspense fallback={<Loading />}>
             {children}
           </Suspense>
-        </OrderProvider>
+        </ClientProviders>
       </body>
     </html>
   );

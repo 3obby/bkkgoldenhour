@@ -1,21 +1,35 @@
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { OrderContext } from '../../contexts/OrderContext';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Checkout() {
   const { order, removeItem, submitOrder } = useContext(OrderContext);
   const [comments, setComments] = useState({});
   const [tableNumber, setTableNumber] = useState('');
   const [selectedOptions, setSelectedOptions] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [currentOrderId, setCurrentOrderId] = useState(null);
   const [orderStatus, setOrderStatus] = useState(null);
   const router = useRouter();
 
+  // Load currentOrderId and orderStatus from localStorage on component mount
+  useEffect(() => {
+    const savedOrderId = localStorage.getItem('currentOrderId');
+    const savedOrderStatus = localStorage.getItem('orderStatus');
+
+    if (savedOrderId) {
+      setCurrentOrderId(savedOrderId);
+    }
+
+    if (savedOrderStatus) {
+      setOrderStatus(savedOrderStatus);
+    }
+  }, []);
+
+  // Fetch order status periodically if there's a currentOrderId
   useEffect(() => {
     let intervalId;
     if (currentOrderId) {
@@ -27,6 +41,7 @@ export default function Checkout() {
         clearInterval(intervalId);
       }
     };
+    // Include fetchOrderStatus in dependencies to avoid warnings
   }, [currentOrderId]);
 
   const fetchOrderStatus = async () => {
@@ -34,6 +49,17 @@ export default function Checkout() {
       const response = await fetch(`/api/orders/${currentOrderId}`);
       const data = await response.json();
       setOrderStatus(data.status);
+      // Save the latest order status to localStorage
+      localStorage.setItem('orderStatus', data.status);
+
+      // Optionally handle order completion
+      if (data.status === 'completed' || data.status === 'cancelled') {
+        // Clear the order tracking data
+        localStorage.removeItem('currentOrderId');
+        localStorage.removeItem('orderStatus');
+        setCurrentOrderId(null);
+        setOrderStatus(null);
+      }
     } catch (error) {
       console.error('Error fetching order status:', error);
     }
@@ -44,11 +70,19 @@ export default function Checkout() {
   };
 
   const handleSubmitOrder = async () => {
+    if (order.length === 0) {
+      alert('Your cart is empty.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const data = await submitOrder(tableNumber, comments, selectedOptions);
       setCurrentOrderId(data.order.id);
       setOrderStatus(data.order.status);
+      // Save currentOrderId and orderStatus to localStorage
+      localStorage.setItem('currentOrderId', data.order.id);
+      localStorage.setItem('orderStatus', data.order.status);
     } catch (error) {
       console.error(error);
       // Handle error if needed

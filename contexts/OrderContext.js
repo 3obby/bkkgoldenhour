@@ -6,7 +6,7 @@ export const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
   const orderKey = 'currentOrder';
-  const [order, setOrder] = useState([]);
+  const [order, setOrder] = useState(null); // Initialize to null
 
   // Load order from localStorage on initial render
   useEffect(() => {
@@ -14,9 +14,11 @@ export const OrderProvider = ({ children }) => {
     setOrder(orderData ? JSON.parse(orderData) : []);
   }, []);
 
-  // Save order to localStorage whenever it changes
+  // Save order to localStorage whenever it changes, but only after loading
   useEffect(() => {
-    localStorage.setItem(orderKey, JSON.stringify(order));
+    if (order !== null) {
+      localStorage.setItem(orderKey, JSON.stringify(order));
+    }
   }, [order]);
 
   // Define methods to modify the order
@@ -64,6 +66,11 @@ export const OrderProvider = ({ children }) => {
       throw error; // Re-throw error to be handled by the caller
     }
   };
+
+  // Wait until order is loaded before rendering children
+  if (order === null) {
+    return null; // Or a loading indicator
+  }
 
   return (
     <OrderContext.Provider
