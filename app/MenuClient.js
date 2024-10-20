@@ -132,7 +132,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
             </div>
         </div>
         {/* View Order Button */}
-        {orderCount > 0 && (
+        
           <div className="order-button-container">
             <Link href="/checkout">
               <button className="cart-button">
@@ -168,7 +168,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
               </button>
             </Link>
           </div>
-        )}
+  
       </nav>
 
       {/* Page Content */}

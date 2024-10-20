@@ -403,3 +403,145 @@ body {
   margin-top: 5px;
   width: 100%;
 }
+
+/* --- New CSS Classes --- */
+
+/* Main checkout page container */
+.checkout-page-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Order list */
+.order-list-new {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+/* Order item row - new layout */
+.order-item-row-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Order item info row */
+.order-item-info-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove button */
+.remove-button-new {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: red;
+  margin-right: 15px;
+}
+
+/* Item quantity */
+.item-quantity-new {
+  font-size: 24px;
+  margin-right: 10px;
+  color: white;
+}
+
+/* Item name */
+.item-name-new {
+  font-size: 24px;
+  margin-right: 10px;
+  color: gold;
+  text-shadow:
+    -1px -1px 0 black,
+     1px -1px 0 black,
+    -1px 1px 0 black,
+     1px 1px 0 black;
+}
+
+/* Item price */
+.item-price-new {
+  font-size: 24px;
+  color: white;
+}
+
+/* Options container */
+.options-container-new {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 10px;
+  width: 80%;
+}
+
+/* Option label */
+.option-label-new {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 5px;
+}
+
+/* Option name */
+.option-name-new {
+  margin-right: 10px;
+  color: white;
+}
+
+/* Option radio button */
+.option-radio-new {
+  width: 25px;
+  height: 25px;
+  accent-color: green;
+}
+
+/* Comment box */
+.comment-box-new {
+  width: 80%;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Submit button container */
+.submit-button-container-new {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* Submit button */
+.submit-button-new {
+  background-color: pink;
+  border: none;
+  border-radius: 50px;
+  padding: 20px 40px;
+  font-size: 48px;
+  cursor: pointer;
+  color: white;
+  text-shadow:
+    -2px -2px 0 #ff1493,
+     2px -2px 0 #ff1493,
+    -2px 2px 0 #ff1493,
+     2px 2px 0 #ff1493;
+}
+
+/* Adjust font sizes for better visibility */
+.item-details,
+.option-name-new,
+.comment-box-new {
+  font-size: 18px;
+}
+
+/* Vertically center content */
+.checkout-page-new {
+  min-height: 100vh;
+  justify-content: center;
+}

@@ -58,8 +58,10 @@ export const OrderProvider = ({ children }) => {
       const data = await response.json();
       console.log('Order submitted:', data);
       clearOrder();
+      return data; // Return the response data
     } catch (error) {
       console.error('Submission error:', error);
+      throw error; // Re-throw error to be handled by the caller
     }
   };
 
