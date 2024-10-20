@@ -19,7 +19,7 @@ export default function Checkout() {
       <br />
 
       <Link href="/adminportal">
-          <button className="button admin-button">Admin Portal</button>
+          <button className="button admin-button">🔒</button>
         </Link>
     </div>
   );

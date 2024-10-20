@@ -7,7 +7,6 @@ export async function POST(request) {
   const { orderItems, tableNumber } = await request.json();
 
   try {
-    // Create a new order in the database
     const order = await prisma.order.create({
       data: {
         status: 'pending',
@@ -17,6 +16,13 @@ export async function POST(request) {
             menuItemId: item.id,
             quantity: item.quantity,
             comment: item.comment || null,
+            orderItemOptions: item.selectedOptionId
+              ? {
+                  create: {
+                    menuItemOptionId: item.selectedOptionId,
+                  },
+                }
+              : undefined,
           })),
         },
       },
@@ -28,7 +34,10 @@ export async function POST(request) {
     return NextResponse.json({ message: 'Order submitted', order });
   } catch (error) {
     console.error('Error submitting order:', error);
-    return NextResponse.json({ error: 'Failed to submit order' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to submit order' },
+      { status: 500 }
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -15,7 +15,7 @@ export default async function Menu() {
   const resCategories = await fetch(`${baseUrl}/api/admin/categories`, { cache: 'no-store' });
   const categoriesData = await resCategories.json();
 
-  // Fetch menu items
+  // Fetch menu items with options
   const resMenuItems = await fetch(`${baseUrl}/api/admin/menuitems`, { cache: 'no-store' });
   const menuItemsData = await resMenuItems.json();
 

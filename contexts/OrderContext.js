@@ -42,12 +42,12 @@ export const OrderProvider = ({ children }) => {
     localStorage.removeItem(orderKey);
   };
 
-  const submitOrder = async (tableNumber, comments) => {
+  const submitOrder = async (tableNumber, comments, selectedOptions) => {
     try {
-      // Prepare order data with comments and tableNumber
       const orderData = order.map((item) => ({
         ...item,
         comment: comments[item.id] || null,
+        selectedOptionId: selectedOptions[item.id] || null,
       }));
 
       const response = await fetch('/api/submitOrder', {

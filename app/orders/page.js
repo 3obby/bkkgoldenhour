@@ -62,6 +62,16 @@ export default function Orders() {
                     <p>
                       {item.quantity} x {item.menuItem.name}
                     </p>
+                    {/* Display selected options */}
+                    {item.orderItemOptions && item.orderItemOptions.length > 0 && (
+                      <ul>
+                        {item.orderItemOptions.map((option) => (
+                          <li key={option.id}>
+                            Option: {option.menuItemOption.name} (+{option.menuItemOption.price}฿)
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                     {item.comment && <p>Comment: {item.comment}</p>}
                   </li>
                 ))}

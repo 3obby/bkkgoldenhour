@@ -20,17 +20,15 @@ export async function GET(request) {
           },
         },
         include: {
-          menuItemCategories: {
-            include: { category: true },
-          },
+          menuItemCategories: { include: { category: true } },
+          menuItemOptions: true, // Include options
         },
       });
     } else {
       menuItems = await prisma.menuItem.findMany({
         include: {
-          menuItemCategories: {
-            include: { category: true },
-          },
+          menuItemCategories: { include: { category: true } },
+          menuItemOptions: true, // Include options
         },
       });
     }
@@ -38,6 +36,9 @@ export async function GET(request) {
     return NextResponse.json(menuItems);
   } catch (error) {
     console.error('Error fetching menu items:', error);
-    return NextResponse.json({ error: 'Error fetching menu items' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Error fetching menu items' },
+      { status: 500 }
+    );
   }
 }

@@ -51,7 +51,7 @@ async function main() {
   const imagesDir = path.join(__dirname, 'itemImages');
 
   for (const item of menuItemsData) {
-    const { fileName, name, description, price, category: categories } = item;
+    const { fileName, name, description, price, category: categories, options } = item;
     const filePath = path.join(imagesDir, fileName);
 
     try {
@@ -77,8 +77,8 @@ async function main() {
         categoryRecords.push({ id: categoryRecord.id });
       }
 
-      // Create a new menu item and connect it to categories
-      await prisma.menuItem.create({
+      // Create a new menu item
+      const menuItem = await prisma.menuItem.create({
         data: {
           name,
           description,
@@ -94,7 +94,21 @@ async function main() {
         },
       });
 
-      console.log(`Successfully uploaded ${fileName} and created new menu item.`);
+      console.log(`Successfully uploaded ${fileName} and created new menu item: ${menuItem.name}`);
+
+      // Create and associate options if they exist
+      if (options && options.length > 0) {
+        for (const option of options) {
+          await prisma.menuItemOption.create({
+            data: {
+              name: option.name,
+              price: option.price,
+              menuItemId: menuItem.id,
+            },
+          });
+        }
+        console.log(`Added options for ${menuItem.name}`);
+      }
     } catch (error) {
       console.error(`Error processing ${fileName}:`, error);
     }
