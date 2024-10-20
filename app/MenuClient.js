@@ -118,7 +118,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
                 className="select-category"
               >
                 <option value="">
-                  ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯{icons[iconIndex]}
+                  ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
@@ -126,6 +126,9 @@ export default function MenuClient({ categories, initialMenuItems }) {
                   </option>
                 ))}
               </select>
+
+              {/* Add the emoji icon outside the dropdown */}
+              <span className="emoji-icon">{icons[iconIndex]}</span>
             </div>
         </div>
         {/* View Order Button */}

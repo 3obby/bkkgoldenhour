@@ -226,6 +226,18 @@ body {
   padding: 10px 20px; /* Added padding for spacing inside the navbar */
 }
 
+/* Add or update this CSS */
+
+.category-filter {
+  display: flex;
+  align-items: center;
+}
+
+.emoji-icon {
+  margin-left: 10px;
+  font-size: 1.5em;
+}
+
 /* Logo Section */
 .logo-container {
   flex: 2; /* Allocates 2/3 of the navbar width */
