@@ -201,15 +201,9 @@ export default function Orders() {
       <nav className="orders-navbar">
         <button
           onClick={() => setHideCompleted(!hideCompleted)}
-          className="toggle-button"
+          className="toggle-button emoji-button"
         >
-          {hideCompleted ? 'Show Completed Orders' : 'Hide Completed Orders'}
-        </button>
-        <button
-          onClick={() => setGroupByCustomer(!groupByCustomer)}
-          className="toggle-button"
-        >
-          {groupByCustomer ? 'Ungroup Orders' : 'Group by Customer'}
+          {hideCompleted ? '💾' : '✅'}
         </button>
       </nav>
       {isLoading ? (

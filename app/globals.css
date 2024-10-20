@@ -1248,4 +1248,10 @@ body {
   margin-top: 10px;
 }
 
-
+.toggle-button.emoji-button {
+  font-size: 2em;      /* Increase the size of the emoji */
+  background: none;    /* Remove background styling */
+  border: none;        /* Remove border */
+  cursor: pointer;
+  padding: 0;          /* Remove default padding */
+}
