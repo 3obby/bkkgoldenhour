@@ -547,7 +547,7 @@ body {
   height: 50px;
   border-radius: 50%;
   background-color: gray;
-  z-index: 1000;
+  z-index: 1;
   animation: buttonClickEffectAnimation var(--speed) forwards;
   animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
   pointer-events: none; /* So it doesn't block clicks */
@@ -749,7 +749,8 @@ body {
 }
 
 .orders-page {
-  text-align: center;
+  /* Remove text-align to default to left alignment */
+  /* text-align: center; */
   color: white;
 }
 
@@ -772,8 +773,9 @@ body {
 .order-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 20px 0;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid white;
 }
 
 .complete-button {
@@ -786,6 +788,7 @@ body {
 
 .order-content {
   text-align: left;
+  width: 100%;
 }
 
 .loading-animation {
@@ -801,6 +804,7 @@ body {
 
 .order-item-detail {
   margin-bottom: 10px;
+  text-align: right;
 }
 
 .order-item-detail p {
@@ -994,6 +998,7 @@ body {
 
 /* Styled card for the order list and submit button */
 .order-card {
+  max-width: 420px;
   background: linear-gradient(85deg, 
     rgba(255, 255, 255, 0.2) 0%,
     rgba(255, 255, 255, 0.1) 5%,
@@ -1022,6 +1027,7 @@ body {
       rgba(255, 255, 255, 0) 16%
     );
     transform: rotate(-5deg);
+    pointer-events: none; /* Add this line */
   }
   padding: 20px;
   border-radius: 0px; /* Square edges */
@@ -1085,7 +1091,7 @@ body {
   height: 50px;
   border-radius: 50%;
   background-color: gray;
-  z-index: 1000;
+  z-index: 1;
   animation: buttonClickEffectAnimation var(--speed) forwards;
   animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
   pointer-events: none; /* So it doesn't block clicks */
@@ -1212,3 +1218,34 @@ body {
     transform: scale(1) rotate(0deg);
   }
 }
+
+.check-button-responsive {
+  transition: transform 0.3s;
+}
+
+.check-button-responsive.clicked {
+  animation: checkButtonClickAnimation 3s forwards;
+}
+
+@keyframes checkButtonClickAnimation {
+  0% {
+    transform: scale(1.2) rotate(-15deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1) rotate(15deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.order-total {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+

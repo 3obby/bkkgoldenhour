@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Add LoadingDots component
 function LoadingDots() {
@@ -18,22 +18,46 @@ function LoadingDots() {
 }
 
 function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
+  const checkButtonRef = useRef(null);
+
+  const handleCheckButtonClick = async () => {
+    if (checkButtonRef.current) {
+      checkButtonRef.current.classList.add('clicked');
+      // Remove the class after 3 seconds (animation duration)
+      setTimeout(() => {
+        if (checkButtonRef.current) {
+          checkButtonRef.current.classList.remove('clicked');
+        }
+      }, 3000);
+    }
+    await handleOrderComplete(order.id);
+  };
+
+  // Calculate the order total
+  const orderTotal = order.orderItems.reduce((total, item) => {
+    const itemTotal = item.quantity * item.menuItem.price;
+    const optionsTotal = item.orderItemOptions.reduce(
+      (optTotal, option) => optTotal + option.menuItemOption.price,
+      0
+    ) * item.quantity;
+    return total + itemTotal + optionsTotal;
+  }, 0);
+
   return (
     <li className="order-item">
       {order.status !== 'completed' && (
         <button
-          onClick={() => handleOrderComplete(order.id)}
-          className="complete-button"
+          onClick={handleCheckButtonClick}
+          className="complete-button check-button-responsive"
+          ref={checkButtonRef}
         >
           {loadingOrderId === order.id ? <LoadingDots /> : '✅'}
         </button>
       )}
       <div className="order-content">
-        <h2>Order #{order.id}</h2>
+        <h2>#{order.id} {order.status}</h2>
         {order.tableNumber && <p>Table Number: {order.tableNumber}</p>}
-        <p>Status: {order.status}</p>
-        <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
-        <h3>Items:</h3>
+    
         <ul className="order-items-list">
           {order.orderItems.map((item) => (
             <li key={item.id} className="order-item-detail">
@@ -53,6 +77,8 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
             </li>
           ))}
         </ul>
+        {/* Display the order total */}
+        <p className="order-total" style={{ textAlign: 'right', fontSize: '1.5em', color: 'gold' }}>{orderTotal}฿</p>
       </div>
     </li>
   );
@@ -63,24 +89,43 @@ export default function Orders() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingOrderId, setLoadingOrderId] = useState(null);
   const [hideCompleted, setHideCompleted] = useState(false);
-  const [groupByCustomer, setGroupByCustomer] = useState(false); // New state
+  const [groupByCustomer, setGroupByCustomer] = useState(false);
+
+  // Use a ref to track if it's the initial load
+  const isInitialLoad = useRef(true);
 
   useEffect(() => {
+    let isMounted = true; // To prevent state updates if component is unmounted
+
     async function fetchOrders() {
-      setIsLoading(true);
+      if (isInitialLoad.current) {
+        setIsLoading(true);
+      }
+
       try {
         const response = await fetch('/api/admin/orders');
         const data = await response.json();
-        setOrders(data);
+
+        if (isMounted) {
+          setOrders(data);
+        }
       } catch (error) {
         console.error('Error fetching orders:', error);
       } finally {
-        setIsLoading(false);
+        if (isMounted && isInitialLoad.current) {
+          setIsLoading(false);
+          isInitialLoad.current = false; // Update after initial load
+        }
       }
     }
+
     fetchOrders();
     const intervalId = setInterval(fetchOrders, 30000);
-    return () => clearInterval(intervalId);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   const handleOrderComplete = async (orderId) => {
