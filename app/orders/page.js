@@ -88,7 +88,7 @@ export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingOrderId, setLoadingOrderId] = useState(null);
-  const [hideCompleted, setHideCompleted] = useState(false);
+  const [hideCompleted, setHideCompleted] = useState(true);
   const [groupByCustomer, setGroupByCustomer] = useState(false);
 
   // Use a ref to track if it's the initial load
@@ -120,7 +120,7 @@ export default function Orders() {
     }
 
     fetchOrders();
-    const intervalId = setInterval(fetchOrders, 30000);
+    const intervalId = setInterval(fetchOrders, 3000);
 
     return () => {
       isMounted = false;

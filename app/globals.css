@@ -223,8 +223,7 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  background-color: #ffffff1f; /* or any color you prefer */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* optional: adds a subtle shadow */
+  
   padding: 10px 20px; /* Added padding for spacing inside the navbar */
 }
 
@@ -236,14 +235,13 @@ body {
 }
 
 .emoji-icon {
-  margin-left: 10px;
   font-size: 1.5em;
 }
 
 /* Logo Section */
 .logo-container {
-  flex: 2; /* Allocates 2/3 of the navbar width */
   display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -256,7 +254,8 @@ body {
 .order-button-container {
   flex: 1; /* Allocates 1/3 of the navbar width */
   display: flex;
-  justify-content: center;
+  justify-content: right;
+  padding-right: 30px;
 }
 
 .view-order-button {
@@ -275,6 +274,10 @@ body {
 .order-count {
   font-size: 16px;
   /* Additional styling for the order count number */
+}
+
+.category-filter {
+  flex: 1;
 }
 
 /* Matrix-style Category Filter */
@@ -369,6 +372,7 @@ body {
 .navbar {
   display: flex;
   justify-content: space-between;
+
 }
 
 .nav-button {
@@ -541,76 +545,57 @@ body {
 /* Style for the spawned effect */
 .button-click-effect {
   position: fixed;
-  /* Left and top will be set inline from the component */
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: gray;
+  font-size: 2em;
   z-index: 1;
   animation: buttonClickEffectAnimation var(--speed) forwards;
-  animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
-  pointer-events: none; /* So it doesn't block clicks */
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-timing-function: linear; /* We'll control timing via keyframes */
 }
 
-/* Revised keyframes for the smooth parabolic arc animation */
+/* Keyframes for the parabolic arc animation */
 @keyframes buttonClickEffectAnimation {
   0% {
-    transform: translate(-50%, -50%) translate(0px, 0px)
+    transform: translate(-50%, -50%)
       translate(0px, 0px)
-      rotate(0deg)
-      scale(1);
+      rotate(var(--initial-rotation))
+      scale(var(--initial-scale));
     opacity: 1;
   }
-  10% {
-    transform: translate(-50%, -50%) translate(calc(0.1 * var(--x-distance)), -80px)
-      rotate(36deg)
-      scale(1.05);
-  }
   20% {
-    transform: translate(-50%, -50%) translate(calc(0.2 * var(--x-distance)), -140px)
-      rotate(72deg)
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.2), -100px)
+      rotate(calc(var(--initial-rotation) + 144deg))
       scale(1.1);
-  }
-  30% {
-    transform: translate(-50%, -50%) translate(calc(0.3 * var(--x-distance)), -180px)
-      rotate(108deg)
-      scale(1.15);
+    opacity: 1;
   }
   40% {
-    transform: translate(-50%, -50%) translate(calc(0.4 * var(--x-distance)), -200px)
-      rotate(144deg)
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.4), -150px)
+      rotate(calc(var(--initial-rotation) + 288deg))
       scale(1.2);
-  }
-  50% {
-    transform: translate(-50%, -50%) translate(calc(0.5 * var(--x-distance)), -210px)
-      rotate(180deg)
-      scale(1.25);
+    opacity: 1;
   }
   60% {
-    transform: translate(-50%, -50%) translate(calc(0.6 * var(--x-distance)), -200px)
-      rotate(216deg)
-      scale(1.2);
-  }
-  70% {
-    transform: translate(-50%, -50%) translate(calc(0.7 * var(--x-distance)), -180px)
-      rotate(252deg)
-      scale(1.15);
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.6), -100px)
+      rotate(calc(var(--initial-rotation) + 432deg))
+      scale(1.1);
+    opacity: 1;
   }
   80% {
-    transform: translate(-50%, -50%) translate(calc(0.8 * var(--x-distance)), -140px)
-      rotate(288deg)
-      scale(1.1);
-  }
-  90% {
-    transform: translate(-50%, -50%) translate(calc(0.9 * var(--x-distance)), -80px)
-      rotate(324deg)
-      scale(1.05);
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.8), 0px)
+      rotate(calc(var(--initial-rotation) + 576deg))
+      scale(1.0);
+    opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) translate(var(--x-distance), 0px)
-      rotate(360deg)
-      scale(1);
+    transform: translate(-50%, -50%)
+      translate(var(--x-distance), 200px)
+      rotate(calc(var(--initial-rotation) + 720deg))
+      scale(0.9);
     opacity: 0;
   }
 }
@@ -1085,76 +1070,57 @@ body {
 /* Style for the spawned effect */
 .button-click-effect {
   position: fixed;
-  /* Left and top will be set inline from the component */
   transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: gray;
+  font-size: 2em;
   z-index: 1;
   animation: buttonClickEffectAnimation var(--speed) forwards;
-  animation-timing-function: linear; /* Use linear timing and control easing via keyframes */
-  pointer-events: none; /* So it doesn't block clicks */
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-timing-function: linear; /* We'll control timing via keyframes */
 }
 
 /* Keyframes for the parabolic arc animation */
 @keyframes buttonClickEffectAnimation {
   0% {
-    transform: translate(-50%, -50%) translate(0px, 0px)
+    transform: translate(-50%, -50%)
       translate(0px, 0px)
-      rotate(0deg)
-      scale(1);
+      rotate(var(--initial-rotation))
+      scale(var(--initial-scale));
     opacity: 1;
   }
-  10% {
-    transform: translate(-50%, -50%) translate(calc(0.1 * var(--x-distance)), -80px)
-      rotate(36deg)
-      scale(1.05);
-  }
   20% {
-    transform: translate(-50%, -50%) translate(calc(0.2 * var(--x-distance)), -140px)
-      rotate(72deg)
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.2), -100px)
+      rotate(calc(var(--initial-rotation) + 144deg))
       scale(1.1);
-  }
-  30% {
-    transform: translate(-50%, -50%) translate(calc(0.3 * var(--x-distance)), -180px)
-      rotate(108deg)
-      scale(1.15);
+    opacity: 1;
   }
   40% {
-    transform: translate(-50%, -50%) translate(calc(0.4 * var(--x-distance)), -200px)
-      rotate(144deg)
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.4), -150px)
+      rotate(calc(var(--initial-rotation) + 288deg))
       scale(1.2);
-  }
-  50% {
-    transform: translate(-50%, -50%) translate(calc(0.5 * var(--x-distance)), -210px)
-      rotate(180deg)
-      scale(1.25);
+    opacity: 1;
   }
   60% {
-    transform: translate(-50%, -50%) translate(calc(0.6 * var(--x-distance)), -200px)
-      rotate(216deg)
-      scale(1.2);
-  }
-  70% {
-    transform: translate(-50%, -50%) translate(calc(0.7 * var(--x-distance)), -180px)
-      rotate(252deg)
-      scale(1.15);
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.6), -100px)
+      rotate(calc(var(--initial-rotation) + 432deg))
+      scale(1.1);
+    opacity: 1;
   }
   80% {
-    transform: translate(-50%, -50%) translate(calc(0.8 * var(--x-distance)), -140px)
-      rotate(288deg)
-      scale(1.1);
-  }
-  90% {
-    transform: translate(-50%, -50%) translate(calc(0.9 * var(--x-distance)), -80px)
-      rotate(324deg)
-      scale(1.05);
+    transform: translate(-50%, -50%)
+      translate(calc(var(--x-distance) * 0.8), 0px)
+      rotate(calc(var(--initial-rotation) + 576deg))
+      scale(1.0);
+    opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) translate(var(--x-distance), 0px)
-      rotate(360deg)
-      scale(1);
+    transform: translate(-50%, -50%)
+      translate(var(--x-distance), 200px)
+      rotate(calc(var(--initial-rotation) + 720deg))
+      scale(0.9);
     opacity: 0;
   }
 }
@@ -1254,4 +1220,143 @@ body {
   border: none;        /* Remove border */
   cursor: pointer;
   padding: 0;          /* Remove default padding */
+}
+
+/* Keyframes for the spinning animation */
+@keyframes spinBackground {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Cart Icon Wrapper */
+.cart-icon-wrapper {
+  position: relative;
+  width: 50px;    /* Ensure width matches the icon */
+  height: 50px;   /* Ensure height matches the icon */
+  overflow: visible; /* Allow pseudo-elements to overflow */
+}
+
+/* Cart Icon */
+.cart-icon {
+  width: 100%;
+  height: 100%;
+  transform-origin: center top; /* Pivot point for rotation */
+}
+
+/* Background Glow */
+.cart-logo-background::before,
+.cart-logo-background::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: -1; /* Ensure they're behind other elements */
+}
+
+.cart-logo-background::before {
+  width: 150%; /* Larger than parent */
+  height: 150%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 149, 0, 1) 0%,
+    rgba(255, 221, 29, 1) 65%,
+    rgba(255, 248, 210, 0.45) 93%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border-radius: 50%;
+  opacity: 0; /* Start hidden */
+}
+
+.cart-logo-background::after {
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 149, 0, 0.3) 0%,
+    rgba(255, 221, 29, 0.15) 50%,
+    rgba(255, 248, 210, 0) 100%
+  );
+  filter: blur(20px);
+  z-index: -2;
+  opacity: 0;
+}
+
+/* Glow Visibility */
+.cart-logo-background.items-in-cart::before,
+.cart-logo-background.items-in-cart::after {
+  opacity: 1;
+}
+
+/* Pendulum Animation */
+.cart-logo-background.items-in-cart .cart-icon {
+  animation: pendulum 4s infinite ease-in-out;
+}
+
+/* Keyframes for Pendulum Animation */
+@keyframes pendulum {
+  0% {
+    transform: rotate(-10deg) scale(1);
+  }
+  25% {
+    transform: rotate(0deg) scale(1.1);
+  }
+  50% {
+    transform: rotate(10deg) scale(1);
+  }
+  75% {
+    transform: rotate(0deg) scale(0.9);
+  }
+  100% {
+    transform: rotate(-10deg) scale(1);
+  }
+}
+
+/* Spin Animation for Glow */
+.cart-logo-background.items-in-cart::before {
+  animation: spinBackground 10s linear infinite;
+}
+
+@keyframes spinBackground {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Entry Animation */
+.cart-icon-wrapper.animate-glow::before,
+.cart-icon-wrapper.animate-glow::after {
+  animation: glowEntry 1s forwards;
+}
+
+@keyframes glowEntry {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Content Container Styles */
+.content-container {
+  max-width: 490px; /* Your desired max width */
+  margin: 0 auto;   /* Centers the container horizontally */
+  /* Add any other styles you need */
 }

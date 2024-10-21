@@ -7,6 +7,7 @@ import { OrderContext } from '../contexts/OrderContext';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import BackgroundCanvas from '@/components/BackgroundCanvas';
+import EmojiIcon from './components/EmojiIcon'; // Updated import path
 
 export default function MenuClient({ categories, initialMenuItems }) {
   const [menuItems, setMenuItems] = useState(initialMenuItems);
@@ -21,6 +22,12 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
   // State for the button click effect
   const [clickedButtons, setClickedButtons] = useState([]);
+
+  // **New state to control background glow**
+  const [showBackgroundGlow, setShowBackgroundGlow] = useState(false);
+
+  // State for cart icon animation
+  const [cartIconAnimationKey, setCartIconAnimationKey] = useState(0);
 
   // Fetch menu items when selectedCategory changes
   useEffect(() => {
@@ -55,6 +62,22 @@ export default function MenuClient({ categories, initialMenuItems }) {
   // Implement handleAddToOrder function with animation
   const handleAddToOrder = (item, event) => {
     addItem(item);
+  
+    // Increment the animation key to trigger re-render
+    setCartIconAnimationKey((prevKey) => prevKey + 1);
+
+    // **Check if the order was previously empty**
+    const wasEmpty = orderCount === 0;
+
+    // **If the cart was empty, show the background glow**
+    if (wasEmpty) {
+      setShowBackgroundGlow(true);
+
+      // Optionally remove the glow after some time
+      setTimeout(() => {
+        setShowBackgroundGlow(false);
+      }, 2000); // Adjust duration as needed
+    }
 
     // Get the button element
     const button = event.currentTarget;
@@ -68,18 +91,23 @@ export default function MenuClient({ categories, initialMenuItems }) {
     }, 200); // Duration matches the CSS animation duration
 
     // Get the button's position
-    const rect = event.currentTarget.getBoundingClientRect();
+    const rect = button.getBoundingClientRect();
     const id = Date.now() + Math.random(); // Unique ID for each effect
 
     // Randomize xDistance between -400px (left) and 400px (right)
-    const xDistance = Math.random() * 800 - 400; // Random distance between -400px and 400px
+    const xDistance = Math.random() * 800 - 400;
 
-    // **Randomize animation duration between 1.5s and 2s**
-    const speed = Math.random() * 500 + 1500; // Random speed between 1500ms and 2000ms
+    // Reduce animation duration to be between 800ms and 1200ms
+    const speed = Math.random() * 400 + 800; // between 800ms and 1200ms
 
-    // **Generate random grayscale shade**
-    const grayValue = Math.floor(Math.random() * 256); // Random value between 0 and 255
-    const grayColor = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+    // Random initial rotation angle between 0 and 360 degrees
+    const initialRotation = Math.random() * 360;
+
+    // Random initial scale between 0.8 and 1.2
+    const initialScale = 0.8 + Math.random() * 0.4;
+
+    // Use the same emoji as in EmojiIcon
+    const currentIcon = icons[iconIndex];
 
     // Add the effect to the array
     setClickedButtons((prev) => [
@@ -88,9 +116,11 @@ export default function MenuClient({ categories, initialMenuItems }) {
         id,
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2,
-        xDistance, // Pass the xDistance to the effect
-        speed,     // Pass the speed to the effect
-        grayColor, // **Pass the random grayscale color**
+        xDistance,
+        speed,
+        icon: currentIcon,
+        initialRotation,
+        initialScale,
       },
     ]);
 
@@ -170,158 +200,169 @@ export default function MenuClient({ categories, initialMenuItems }) {
         }
       `}</style>
 
-      {/* Navbar */}
-      <nav className="navbar" ref={navbarRef}>
-        {/* Logo Section */}
-        <div className="logo-container">
-          <div className="category-filter matrix-style">
-            <select
-              id="category-select"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="select-category"
-            >
-              <option value="">
-                ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{category.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Add the emoji icon outside the dropdown */}
-            <span className="emoji-icon">{icons[iconIndex]}</span>
-          </div>
-        </div>
-        {/* View Order Button */}
-        <div className="order-button-container">
-          <button
-            className="cart-button cart-button-responsive"
-            ref={cartButtonRef}
-            onClick={handleCartButtonClick}
-          >
-            <div className="cart-icon-wrapper" style={{ position: 'relative' }}>
-              <Image
-                src="/images/shopping-cart.png"
-                alt="Shopping Cart"
-                width={50}
-                height={50}
-                className="cart-icon"
-              />
-              <span
-                className="order-count"
-                style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '0',
-                  color: 'gold',
-                  borderRadius: '50%',
-                  fontSize: '32px',
-                  width: '50px',
-                  height: '50px',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textShadow:
-                    '-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black',
-                }}
+      {/* Wrap your content inside the content-container */}
+      <div className="content-container">
+        {/* Navbar */}
+        <nav className="navbar" ref={navbarRef}>
+          {/* Logo Section */}
+          <div className="logo-container">
+            <div className="category-filter matrix-style">
+              <select
+                id="category-select"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="select-category"
               >
-                {orderCount}
-              </span>
+                <option value="">
+                  ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯\_(ツ)_/¯
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    ▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{category.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          </button>
-        </div>
-      </nav>
 
-      {/* Page Content */}
-      <div className="menu-page">
-        {/* Content wrapper */}
-        <div className="content-wrapper" style={{ paddingTop: navbarHeight }}>
-          {/* Menu Items */}
-          {menuItems && menuItems.length > 0 ? (
-            <ul className="menu-list">
-              {menuItems.map((item) => (
-                <li key={item.id} className="menu-item">
-                  {/* Image Container */}
-                  <div className="image-container">
-                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                      <div style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          width={600}
-                          height={600}
-                          className="item-image"
-                          style={{ width: '100%', height: 'auto' }}
-                        />
-                        {/* Item Name Overlay */}
-                        <h1
-                          className="item-name"
-                          style={{
-                            position: 'absolute',
-                            top: '10%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: '100%',
-                            textAlign: 'center',
-                          }}
-                        >
-                          {item.name}
-                        </h1>
+            {/* Pass iconIndex and setIconIndex to EmojiIcon */}
+            <EmojiIcon iconIndex={iconIndex} setIconIndex={setIconIndex} icons={icons} />
+
+            {/* ... rest of logo-container if any ... */}
+          </div>
+          {/* View Order Button */}
+          <div className="order-button-container">
+            <button
+              className="cart-button cart-button-responsive"
+              ref={cartButtonRef}
+              onClick={handleCartButtonClick}
+            >
+              <div
+              key={cartIconAnimationKey}
+                className={`cart-icon-wrapper cart-logo-background ${
+                  cartIconAnimationKey ? 'animate-glow' : ''
+                } ${orderCount > 0 ? 'items-in-cart' : ''}`}
+              >
+                <Image
+                  src="/images/shopping-cart.png"
+                  alt="Shopping Cart"
+                  width={50}
+                  height={50}
+                  className="cart-icon"
+                />
+                <span
+                  className="order-count"
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    color: 'gold',
+                    borderRadius: '50%',
+                    fontSize: '32px',
+                    width: '50px',
+                    height: '50px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    textShadow:
+                      '-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black',
+                  }}
+                >
+                  {orderCount}
+                </span>
+              </div>
+            </button>
+          </div>
+        </nav>
+
+        {/* Page Content */}
+        <div className="menu-page">
+          {/* Content wrapper */}
+          <div className="content-wrapper" style={{ paddingTop: navbarHeight }}>
+            {/* Menu Items */}
+            {menuItems && menuItems.length > 0 ? (
+              <ul className="menu-list">
+                {menuItems.map((item) => (
+                  <li key={item.id} className="menu-item">
+                    {/* Image Container */}
+                    <div className="image-container">
+                      <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                        <div style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.name}
+                            width={600}
+                            height={600}
+                            className="item-image"
+                            style={{ width: '100%', height: 'auto' }}
+                          />
+                          {/* Item Name Overlay */}
+                          <h1
+                            className="item-name"
+                            style={{
+                              position: 'absolute',
+                              top: '10%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: '100%',
+                              textAlign: 'center',
+                            }}
+                          >
+                            {item.name}
+                          </h1>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Footer with Price and Add Button */}
-                    <div
-                      className="item-footer"
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100%',
-                        transform: 'translateY(-50px)',
-                      }}
-                    >
+                      {/* Footer with Price and Add Button */}
                       <div
-                        className="item-description"
+                        className="item-footer"
                         style={{
                           display: 'flex',
+                          flexDirection: 'row',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          textAlign: 'center',
                           height: '100%',
+                          transform: 'translateY(-50px)',
                         }}
                       >
-                        <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
-                      </div>
-                      <div className="item-price-container">
-                        <p className="item-price" style={{ fontSize: '1.2em' }}>
-                          {item.price}฿
-                        </p>
-                        <button
-                          onClick={(event) => handleAddToOrder(item, event)}
-                          className="add-button centered-button"
+                        <div
+                          className="item-description"
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                            height: '100%',
+                          }}
                         >
-                          ➕
-                        </button>
+                          <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
+                        </div>
+                        <div className="item-price-container">
+                          <p className="item-price" style={{ fontSize: '1.2em' }}>
+                            {item.price}฿
+                          </p>
+                          <button
+                            onClick={(event) => handleAddToOrder(item, event)}
+                            className="add-button centered-button"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No menu items available.</p>
-          )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No menu items available.</p>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Render the button click effects */}
       {clickedButtons.map((effect) => (
-        <div
+        // Replace the div with a span to render the emoji icon
+        <span
           key={effect.id}
           className="button-click-effect"
           style={{
@@ -329,9 +370,12 @@ export default function MenuClient({ categories, initialMenuItems }) {
             top: effect.y,
             '--x-distance': `${effect.xDistance}px`,
             '--speed': `${effect.speed}ms`,
-            backgroundColor: effect.grayColor, // **Set the random grayscale color**
+            '--initial-rotation': `${effect.initialRotation}deg`,
+            '--initial-scale': effect.initialScale,
           }}
-        ></div>
+        >
+          {effect.icon}
+        </span>
       ))}
     </>
   );
