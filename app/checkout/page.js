@@ -292,7 +292,7 @@ export default function Checkout() {
                   className="submit-button-new"
                   ref={buttonRef} // Attach the ref to the button
                 >
-                  👍🔜👨‍🍳
+                  👍👨‍🍳
                 </button>
                 {showButtonEffect && (
                   <div className="button-click-effect"></div>

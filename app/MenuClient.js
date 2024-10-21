@@ -8,6 +8,17 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import BackgroundCanvas from '@/components/BackgroundCanvas';
 import EmojiIcon from './components/EmojiIcon';
+import OrderModal from '../components/OrderModal';
+import OrdersInfo from '../components/OrdersInfo'; // Import OrdersInfo component
+
+// Custom hook to keep track of previous value
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
 export default function MenuClient({ categories, initialMenuItems }) {
   const [menuItems, setMenuItems] = useState(initialMenuItems);
@@ -15,19 +26,45 @@ export default function MenuClient({ categories, initialMenuItems }) {
   const { order, addItem } = useContext(OrderContext);
   const router = useRouter();
 
+  // Calculate total quantity in the order
+  const orderCount = order.reduce((total, item) => total + item.quantity, 0);
+
+  // Keep track of previous orderCount to detect when cart becomes empty
+  const prevOrderCount = usePrevious(orderCount);
+
   // State and references for icon animation
   const [iconIndex, setIconIndex] = useState(0);
-  const icons = ['🥩', '🍟', '🍻', '🍰', '🍹', '🍗', '🐔', '🥖', '🦐', '🍤', '🥔', '🍠', '🧆', '🍝', '🐟', '🍔', '🍲', '🥭', '🟫', '🍸', '🥃', '🏺', '🍹', '💨'];
+  const icons = ['🥩', '🍟', '🍻', '🍰', '🍹', '🍗', '🐔', '���', '🦐', '🍤', '🥔', '🍠', '🧆', '🍝', '🐟', '🍔', '🍲', '🥭', '🟫', '🍸', '🥃', '🏺', '🍹', '💨'];
   const timeoutRef = useRef(null);
 
   // State for the button click effect
   const [clickedButtons, setClickedButtons] = useState([]);
 
-  // **New state to control background glow**
+  // State to control background glow
   const [showBackgroundGlow, setShowBackgroundGlow] = useState(false);
 
   // State for cart icon animation
   const [cartIconAnimationKey, setCartIconAnimationKey] = useState(0);
+
+  // State variables to control modal visibility
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [isOrdersInfoOpen, setIsOrdersInfoOpen] = useState(false);
+
+  // State variable to control scroll burst effect
+  const [showScrollBurst, setShowScrollBurst] = useState(false);
+
+  // Detect when cart becomes empty to trigger burst effect
+  useEffect(() => {
+    if (prevOrderCount > 0 && orderCount === 0) {
+      // Cart just became empty
+      setShowScrollBurst(true);
+
+      // Remove the burst effect after animation ends
+      setTimeout(() => {
+        setShowScrollBurst(false);
+      }, 1000); // Match the duration of the burstEffectAnimation
+    }
+  }, [orderCount, prevOrderCount]);
 
   // Fetch menu items when selectedCategory changes
   useEffect(() => {
@@ -56,20 +93,17 @@ export default function MenuClient({ categories, initialMenuItems }) {
     }
   }, [selectedCategory]);
 
-  // Calculate total quantity in the order
-  const orderCount = order.reduce((total, item) => total + item.quantity, 0);
-
   // Implement handleAddToOrder function with animation
   const handleAddToOrder = (item, event) => {
     addItem(item);
-  
+
     // Increment the animation key to trigger re-render
     setCartIconAnimationKey((prevKey) => prevKey + 1);
 
-    // **Check if the order was previously empty**
+    // Check if the order was previously empty
     const wasEmpty = orderCount === 0;
 
-    // **If the cart was empty, show the background glow**
+    // If the cart was empty, show the background glow
     if (wasEmpty) {
       setShowBackgroundGlow(true);
 
@@ -82,12 +116,18 @@ export default function MenuClient({ categories, initialMenuItems }) {
     // Get the button element
     const button = event.currentTarget;
 
+    // Remove the 'clicked' class to reset the animation
+    button.classList.remove('clicked');
+
+    // Force a reflow to restart the animation
+    void button.offsetWidth;
+
     // Add the 'clicked' and 'glow-visible' classes to trigger animations
     button.classList.add('clicked', 'glow-visible');
 
-    // Remove the 'clicked' and 'glow-visible' classes after the animation ends
+    // Remove the 'glow-visible' class after the animation ends
     setTimeout(() => {
-      button.classList.remove('clicked', 'glow-visible');
+      button.classList.remove('glow-visible');
     }, 500); // Adjust duration as needed
 
     // Get the button's position
@@ -126,7 +166,9 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
     // Remove the effect after the animation duration
     setTimeout(() => {
-      setClickedButtons((prev) => prev.filter((effect) => effect.id !== id));
+      setClickedButtons((prev) =>
+        prev.filter((effect) => effect.id !== id)
+      );
     }, speed);
   };
 
@@ -142,18 +184,22 @@ export default function MenuClient({ categories, initialMenuItems }) {
   const cartButtonRef = useRef(null);
 
   const handleCartButtonClick = (event) => {
-    event.preventDefault(); // Prevent default navigation
+    event.preventDefault();
 
-    // Add 'clicked' class to trigger animation
     if (cartButtonRef.current) {
       cartButtonRef.current.classList.add('clicked');
 
-      // Remove the 'clicked' class after the animation ends
       setTimeout(() => {
         cartButtonRef.current.classList.remove('clicked');
-        // Navigate to the checkout page after animation
-        router.push('/checkout');
-      }, 500); // Duration matches the CSS animation duration
+
+        if (order.length > 0) {
+          // Open OrderModal if cart is not empty
+          setIsOrderModalOpen(true);
+        } else {
+          // Open OrdersInfo modal if cart is empty
+          setIsOrdersInfoOpen(true);
+        }
+      }, 500);
     }
   };
 
@@ -194,7 +240,11 @@ export default function MenuClient({ categories, initialMenuItems }) {
             </div>
 
             {/* Emoji Icon */}
-            <EmojiIcon iconIndex={iconIndex} setIconIndex={setIconIndex} icons={icons} />
+            <EmojiIcon
+              iconIndex={iconIndex}
+              setIconIndex={setIconIndex}
+              icons={icons}
+            />
           </div>
 
           {/* Right Section */}
@@ -203,41 +253,36 @@ export default function MenuClient({ categories, initialMenuItems }) {
               className="cart-button cart-button-responsive"
               ref={cartButtonRef}
               onClick={handleCartButtonClick}
-              style={{marginRight: '20px'}}
+              style={{ marginRight: '20px', display: 'flex', alignItems: 'center' }}
             >
+              {/* Only display order count when orderCount > 0 */}
+              {orderCount > 0 && (
+                <span className="order-count">{orderCount}</span>
+              )}
+
               <div
                 key={cartIconAnimationKey}
-                className={`cart-icon-wrapper cart-logo-background ${
-                  cartIconAnimationKey ? 'animate-glow' : ''
-                } ${orderCount > 0 ? 'items-in-cart' : ''}`}
+                className={`${
+                  orderCount > 0
+                    ? 'cart-icon-wrapper cart-logo-background'
+                    : 'scroll-icon-wrapper'
+                } ${cartIconAnimationKey ? 'animate-glow' : ''} ${
+                  orderCount > 0 ? 'items-in-cart' : ''
+                } ${
+                  showScrollBurst && orderCount === 0 ? 'burst-effect' : ''
+                }`}
               >
                 <Image
-                  src="/images/shopping-cart.png"
-                  alt="Shopping Cart"
+                  src={
+                    orderCount > 0
+                      ? '/images/shopping-cart.png' // Cart image when items are in the cart
+                      : '/images/scroll.png' // Scroll image when cart is empty
+                  }
+                  alt="Cart Icon"
                   width={50}
                   height={50}
-                  className="cart-icon"
+                  className={orderCount > 0 ? 'cart-icon' : 'scroll-icon'}
                 />
-                <span
-                  className="order-count"
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    left: '0',
-                    color: 'gold',
-                    borderRadius: '50%',
-                    fontSize: '32px',
-                    width: '50px',
-                    height: '50px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    textShadow:
-                      '-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black',
-                  }}
-                >
-                  {orderCount}
-                </span>
               </div>
             </button>
           </div>
@@ -246,7 +291,10 @@ export default function MenuClient({ categories, initialMenuItems }) {
         {/* Page Content */}
         <div className="menu-page">
           {/* Content wrapper */}
-          <div className="content-wrapper" style={{ paddingTop: navbarHeight }}>
+          <div
+            className="content-wrapper"
+            style={{ paddingTop: navbarHeight }}
+          >
             {/* Menu Items */}
             {menuItems && menuItems.length > 0 ? (
               <ul className="menu-list">
@@ -254,8 +302,20 @@ export default function MenuClient({ categories, initialMenuItems }) {
                   <li key={item.id} className="menu-item">
                     {/* Image Container */}
                     <div className="image-container">
-                      <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                        <div style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          width: '100%',
+                        }}
+                      >
+                        <div
+                          style={{
+                            position: 'relative',
+                            width: '100%',
+                            maxWidth: '600px',
+                          }}
+                        >
                           <Image
                             src={item.imageUrl}
                             alt={item.name}
@@ -293,12 +353,21 @@ export default function MenuClient({ categories, initialMenuItems }) {
                             height: '100%',
                           }}
                         >
-                          <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
+                          <p
+                            style={{
+                              textAlign: 'center',
+                              width: '100%',
+                            }}
+                          >
+                            {item.description}
+                          </p>
                         </div>
                         <div className="item-price-container">
                           <p className="item-price">{item.price}฿</p>
                           <button
-                            onClick={(event) => handleAddToOrder(item, event)}
+                            onClick={(event) =>
+                              handleAddToOrder(item, event)
+                            }
                             className="add-button centered-button add-button-large add-button-glow"
                           >
                             +
@@ -334,6 +403,16 @@ export default function MenuClient({ categories, initialMenuItems }) {
           {effect.icon}
         </span>
       ))}
+
+      {/* Render the OrderModal */}
+      {isOrderModalOpen && (
+        <OrderModal onClose={() => setIsOrderModalOpen(false)} />
+      )}
+
+      {/* Render the OrdersInfo modal */}
+      {isOrdersInfoOpen && (
+        <OrdersInfo onClose={() => setIsOrdersInfoOpen(false)} />
+      )}
     </>
   );
 }

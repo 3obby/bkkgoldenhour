@@ -285,10 +285,7 @@ body {
   margin-right: 8px; /* Space between the cart icon and the order count */
 }
 
-.order-count {
-  font-size: 16px;
-  /* Additional styling for the order count number */
-}
+
 
 .category-filter {
   flex: 1;
@@ -475,6 +472,7 @@ body {
 
 /* Remove button styling */
 .remove-button-new {
+  padding-right: 32px;
   background: none;
   border: none;
   font-size: 24px;
@@ -621,69 +619,22 @@ body {
   }
 }
 
-/* Animation for the add-button when clicked */
+/* Simplified animation for the add-button when clicked */
 .add-button.clicked {
-  animation: addButtonClickAnimation 0.1s;
+  animation: addButtonClickAnimation 0.2s ease-in-out;
 }
 
- /* Start of Selection */
 @keyframes addButtonClickAnimation {
   0% {
     transform: scale(1);
-    background-color: rgba(40, 167, 69, 0);
-    box-shadow: none;
-    opacity: 0;
-  }
-  12.5% {
-    transform: scale(1.2);
-    background-color: rgba(40, 167, 69, 0.18);
-    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-    opacity: 0.3;
-  }
-  25% {
-    transform: scale(1.4);
-    background-color: rgba(40, 167, 69, 0.36);
-    box-shadow: 0 0 20px rgba(40, 167, 69, 0.42);
-    opacity: 0.42;
-  }
-  37.5% {
-    transform: scale(1.6);
-    background-color: rgba(40, 167, 69, 0.48);
-    box-shadow: 0 0 30px rgba(40, 167, 69, 0.54);
-    opacity: 0.54;
   }
   50% {
-    transform: scale(1.8);
-    background-color: rgba(40, 167, 69, 0.6);
-    box-shadow: 0 0 40px rgba(40, 167, 69, 0.6);
-    opacity: 0.6;
-  }
-  62.5% {
-    transform: scale(1.6);
-    background-color: rgba(40, 167, 69, 0.48);
-    box-shadow: 0 0 30px rgba(40, 167, 69, 0.54);
-    opacity: 0.54;
-  }
-  75% {
-    transform: scale(1.4);
-    background-color: rgba(40, 167, 69, 0.36);
-    box-shadow: 0 0 20px rgba(40, 167, 69, 0.42);
-    opacity: 0.42;
-  }
-  87.5% {
-    transform: scale(1.2);
-    background-color: rgba(40, 167, 69, 0.18);
-    box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
-    opacity: 0.3;
+    transform: scale(0.95); /* Slightly reduce the scale for a subtle press effect */
   }
   100% {
     transform: scale(1);
-    background-color: rgba(40, 167, 69, 0);
-    box-shadow: none;
-    opacity: 0;
   }
 }
-
 
 /* Submit button click animation */
 .submit-button-new.clicked {
@@ -710,7 +661,7 @@ body {
   background: linear-gradient(45deg, #37c019, #3fab1e, #467a3b, #196b21);
   background-size: 300% 300%;
   border-radius: 100%;
-  padding: 20px 20px;
+
   font-size: 48px;
   cursor: pointer;
   color: white;
@@ -988,17 +939,12 @@ body {
 }
 
 .order-count {
-  position: absolute;
-  top: 0;
-  left: 0;
+
   color: gold;
   font-size: 64px;
-  width: 128px;
-  height: 128px;
-  display: flex;
+
   justify-content: center;
   align-items: center;
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
 }
 
 /* Background colors based on status */
@@ -1049,7 +995,7 @@ body {
 /* Styled card for the order list and submit button */
 .order-card {
   max-width: 420px;
-  background: linear-gradient(85deg, 
+  /* background: linear-gradient(85deg, 
     rgba(255, 255, 255, 0.2) 0%,
     rgba(255, 255, 255, 0.1) 5%,
     rgba(255, 255, 255, 0.05) 10%,
@@ -1060,25 +1006,10 @@ body {
     rgba(255, 255, 255, 0.05) 90%,
     rgba(255, 255, 255, 0.1) 95%,
     rgba(255, 255, 255, 0.2) 100%
-  );
+  ); */
   position: relative;
   overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 30%;
-    left: -10%;
-    width: 120%;
-    height: 40%;
-    background: linear-gradient(to right, 
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.07) 3%,
-      rgba(255, 255, 255, 0) 16%
-    );
-    transform: rotate(-5deg);
-    pointer-events: none; /* Add this line */
-  }
   padding: 20px;
   border-radius: 0px; /* Square edges */
   width: 90%;         /* Optional: Adjust width as needed */
@@ -1087,13 +1018,13 @@ body {
 
 /* Gamertag styling */
 .gamertag {
+  font-family: 'Rubik';
   display: flex;
   align-items: center;
   background-color: #2d2d2d; /* Dark background for the gamertag */
-  border-radius: 0 0 25px 25px;       /* Rounded-pill shape with flat top */
   padding: 10px 20px;
   margin-bottom: 20px;
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .gamertag-icon {
@@ -1130,6 +1061,7 @@ body {
 .submit-button-container-new {
   /* ... existing styles ... */
   position: relative;
+  margin: 30px auto;
 }
 
 /* Style for the spawned effect */
@@ -1192,9 +1124,8 @@ body {
 
 /* Animation for the add-button when clicked */
 .add-button.clicked {
-  animation: addButtonClickAnimation 0.2s;
+  animation: addButtonClickAnimation 0.2s ease-in-out;
 }
-
 
 /* Optional: Change the add-button styles */
 .add-button {
@@ -1423,5 +1354,126 @@ body {
   z-index: 1;      /* Ensure the button stays above the glow */
 }
 
+/* Styles for the modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s forwards;
+}
 
+.modal-content {
+  width: 80%;
+  background-color: rgba(50, 50, 50, 0.9); /* Semi-transparent card */
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  opacity: 0;
+  animation: slideIn 0.1s forwards;
+  position: relative;
+}
 
+/* Close button style */
+.modal-close-button {
+
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide-in animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Scroll Icon Wrapper */
+.scroll-icon-wrapper {
+  position: relative;
+  width: 50px;    /* Match the icon size */
+  height: 50px;
+  overflow: visible;
+}
+
+/* Scroll Icon */
+.scroll-icon {
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+}
+
+/* Burst Widening Animation */
+.scroll-icon-wrapper.burst-effect::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: burstEffectAnimation 1s forwards;
+}
+
+@keyframes burstEffectAnimation {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.8;
+  }
+  50% {
+    width: 150px;  /* Adjust size as needed */
+    height: 150px;
+    opacity: 0.4;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+/* Optional: Adjust the scroll icon when the burst effect is active */
+.scroll-icon-wrapper.burst-effect .scroll-icon {
+  animation: scrollIconPop 1s forwards;
+}
+
+@keyframes scrollIconPop {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ... existing code ... */
