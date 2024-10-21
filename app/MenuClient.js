@@ -7,7 +7,7 @@ import { OrderContext } from '../contexts/OrderContext';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import BackgroundCanvas from '@/components/BackgroundCanvas';
-import EmojiIcon from './components/EmojiIcon'; // Updated import path
+import EmojiIcon from './components/EmojiIcon';
 
 export default function MenuClient({ categories, initialMenuItems }) {
   const [menuItems, setMenuItems] = useState(initialMenuItems);
@@ -82,13 +82,13 @@ export default function MenuClient({ categories, initialMenuItems }) {
     // Get the button element
     const button = event.currentTarget;
 
-    // Add the 'clicked' class to trigger animation
-    button.classList.add('clicked');
+    // Add the 'clicked' and 'glow-visible' classes to trigger animations
+    button.classList.add('clicked', 'glow-visible');
 
-    // Remove the 'clicked' class after the animation ends
+    // Remove the 'clicked' and 'glow-visible' classes after the animation ends
     setTimeout(() => {
-      button.classList.remove('clicked');
-    }, 200); // Duration matches the CSS animation duration
+      button.classList.remove('clicked', 'glow-visible');
+    }, 500); // Adjust duration as needed
 
     // Get the button's position
     const rect = button.getBoundingClientRect();
@@ -129,37 +129,6 @@ export default function MenuClient({ categories, initialMenuItems }) {
       setClickedButtons((prev) => prev.filter((effect) => effect.id !== id));
     }, speed);
   };
-
-  useEffect(() => {
-    let isMounted = true;
-
-    function updateIcon() {
-      if (!isMounted) return;
-
-      // Update icon index
-      setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
-
-      // Calculate new delay for cyclic timing (fast to slow to fast)
-      const maxDelay = 300; // Maximum delay in ms
-      const minDelay = 3;   // Minimum delay in ms
-      const period = 5000;  // Full cycle period in ms
-      const time = Date.now() % period;
-      const sineValue = Math.sin((2 * Math.PI * time) / period); // Ranges from -1 to 1
-      const newDelay = minDelay + ((maxDelay - minDelay) * (1 - sineValue) / 2);
-
-      // Schedule next update
-      timeoutRef.current = setTimeout(updateIcon, newDelay);
-    }
-
-    // Start the animation
-    timeoutRef.current = setTimeout(updateIcon, 200); // Initial delay
-
-    // Cleanup on unmount
-    return () => {
-      isMounted = false;
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
 
   const navbarRef = useRef(null);
   const [navbarHeight, setNavbarHeight] = useState(0);
@@ -204,8 +173,8 @@ export default function MenuClient({ categories, initialMenuItems }) {
       <div className="content-container">
         {/* Navbar */}
         <nav className="navbar" ref={navbarRef}>
-          {/* Logo Section */}
-          <div className="logo-container">
+          {/* Left Section */}
+          <div className="navbar-left">
             <div className="category-filter matrix-style">
               <select
                 id="category-select"
@@ -224,20 +193,20 @@ export default function MenuClient({ categories, initialMenuItems }) {
               </select>
             </div>
 
-            {/* Pass iconIndex and setIconIndex to EmojiIcon */}
+            {/* Emoji Icon */}
             <EmojiIcon iconIndex={iconIndex} setIconIndex={setIconIndex} icons={icons} />
-
-            {/* ... rest of logo-container if any ... */}
           </div>
-          {/* View Order Button */}
-          <div className="order-button-container">
+
+          {/* Right Section */}
+          <div className="navbar-right">
             <button
               className="cart-button cart-button-responsive"
               ref={cartButtonRef}
               onClick={handleCartButtonClick}
+              style={{marginRight: '20px'}}
             >
               <div
-              key={cartIconAnimationKey}
+                key={cartIconAnimationKey}
                 className={`cart-icon-wrapper cart-logo-background ${
                   cartIconAnimationKey ? 'animate-glow' : ''
                 } ${orderCount > 0 ? 'items-in-cart' : ''}`}
@@ -313,17 +282,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
                       </div>
 
                       {/* Footer with Price and Add Button */}
-                      <div
-                        className="item-footer"
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          height: '100%',
-                          transform: 'translateY(-50px)',
-                        }}
-                      >
+                      <div className="item-footer">
                         <div
                           className="item-description"
                           style={{
@@ -337,12 +296,10 @@ export default function MenuClient({ categories, initialMenuItems }) {
                           <p style={{ textAlign: 'center', width: '100%' }}>{item.description}</p>
                         </div>
                         <div className="item-price-container">
-                          <p className="item-price" style={{ fontSize: '1.2em' }}>
-                            {item.price}฿
-                          </p>
+                          <p className="item-price">{item.price}฿</p>
                           <button
                             onClick={(event) => handleAddToOrder(item, event)}
-                            className="add-button centered-button"
+                            className="add-button centered-button add-button-large add-button-glow"
                           >
                             +
                           </button>

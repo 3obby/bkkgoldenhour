@@ -1,16 +1,22 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function EmojiIcon({ iconIndex, setIconIndex, icons }) {
   const timeoutRef = useRef(null);
 
+  // State to manage pause/resume functionality
+  const [isPaused, setIsPaused] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
 
+    // Function to update the icon
     function updateIcon() {
       if (!isMounted) return;
 
-      // Update icon index
-      setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
+      if (!isPaused) {
+        // Update icon index
+        setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
+      }
 
       // Calculate new delay for cyclic timing (fast to slow to fast)
       const maxDelay = 300; // Maximum delay in ms
@@ -24,19 +30,29 @@ export default function EmojiIcon({ iconIndex, setIconIndex, icons }) {
       timeoutRef.current = setTimeout(updateIcon, newDelay);
     }
 
-    // Start the animation
-    timeoutRef.current = setTimeout(updateIcon, 200); // Initial delay
+    // Before starting, clear any existing timeouts
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
 
-    // Cleanup on unmount
+    // Start the animation only if not paused
+    if (!isPaused) {
+      timeoutRef.current = setTimeout(updateIcon, 200); // Initial delay
+    }
+
+    // Cleanup on unmount or when dependencies change
     return () => {
       isMounted = false;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [setIconIndex, icons.length]);
+  }, [isPaused, setIconIndex, icons.length]);
 
   return (
     <>
-      <div className="emoji-icon-container">
+      <div
+        className="emoji-icon-container"
+        onClick={() => setIsPaused(!isPaused)}  // Toggle pause/resume on click
+      >
         {/* Custom Dotted Circle with SVG */}
         <svg
           className="dotted-circle-svg"
@@ -58,12 +74,13 @@ export default function EmojiIcon({ iconIndex, setIconIndex, icons }) {
       </div>
       <style jsx>{`
         .emoji-icon-container {
-          position: fixed; /* Fixed positioning relative to the viewport */
-          bottom: 20px;    /* 20px from the bottom of the viewport */
-          left: 20px;      /* 20px from the left of the viewport */
+          position: fixed;
+          bottom: 20px;
+          left: 20px;
           width: 4em;
           height: 4em;
-          z-index: 1000;   /* Ensure it stays above other elements */
+          z-index: 1000;
+          cursor: pointer;  /* Change cursor to indicate clickability */
         }
 
         .emoji-icon {
