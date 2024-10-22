@@ -127,7 +127,7 @@ export default function OrdersInfo({ onClose }) {
                 fontSize: '22px',
                 lineHeight: '8px',
                 minHeight: '100px',
-                color: 'rgb(0, 255, 0)',
+                color: '#FF1493',
               }}
             >
               {asciiFrames[currentFrame]}

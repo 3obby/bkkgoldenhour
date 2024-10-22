@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useContext, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import { OrderContext } from '../contexts/OrderContext';
 import Image from 'next/image';
 
@@ -11,8 +12,19 @@ export default function OrderModal({ onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const buttonRef = useRef(null);
   const [showCommentBox, setShowCommentBox] = useState({});
+  const [customerId, setCustomerId] = useState(null); // Add this line
 
-  // Add this useEffect hook to close the modal when the order is empty
+  // Retrieve or generate the customer ID
+  useEffect(() => {
+    let savedCustomerId = localStorage.getItem('customerId');
+    if (!savedCustomerId) {
+      savedCustomerId = uuidv4();
+      localStorage.setItem('customerId', savedCustomerId);
+    }
+    setCustomerId(savedCustomerId);
+  }, []);
+
+  // Close the modal when the order is empty
   useEffect(() => {
     if (order.length === 0) {
       onClose();
@@ -28,7 +40,8 @@ export default function OrderModal({ onClose }) {
 
     setIsLoading(true);
     try {
-      await submitOrder(null, comments, selectedOptions);
+      // Pass customerId to submitOrder
+      await submitOrder(null, comments, selectedOptions, customerId);
       // Close the modal after submission
       onClose();
     } catch (error) {
@@ -174,7 +187,6 @@ export default function OrderModal({ onClose }) {
             </div>
           </div>
         )}
-       
       </div>
     </div>
   );
