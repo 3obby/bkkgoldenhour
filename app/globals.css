@@ -1285,25 +1285,34 @@ body {
 
 /* Pendulum Animation */
 .cart-logo-background.items-in-cart .cart-icon {
-  animation: pendulum 4s infinite ease-in-out;
+  animation: pendulum 1s ease-in-out;
 }
 
 /* Keyframes for Pendulum Animation */
 @keyframes pendulum {
   0% {
-    transform: rotate(-10deg) scale(1);
+    transform: rotate(-60deg) scale(0);
   }
   25% {
-    transform: rotate(0deg) scale(1.1);
+    transform: rotate(45deg) scale(0.3);
   }
   50% {
-    transform: rotate(10deg) scale(1);
+    transform: rotate(10deg) scale(1.1);
   }
-  75% {
-    transform: rotate(0deg) scale(0.9);
+  60% {
+    transform: rotate(0deg) scale(0.1);
+  }
+  70% {
+    transform: rotate(0deg) scale(0.1);
+  }
+  80% {
+    transform: rotate(-10deg) scale(1.1);
+  }
+  90% {
+    transform: rotate(0deg) scale(0.5);
   }
   100% {
-    transform: rotate(-10deg) scale(1);
+    transform: rotate(0deg) scale(1);
   }
 }
 
@@ -1442,8 +1451,10 @@ body {
   height: 0;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0) 70%
+    rgb(255, 0, 230) 0%,
+    rgba(211, 93, 200, 0.827) 40%,
+
+    rgba(239, 236, 236, 0) 50%
   );
   transform: translate(-50%, -50%);
   opacity: 0;
@@ -1470,7 +1481,7 @@ body {
 
 /* Optional: Adjust the scroll icon when the burst effect is active */
 .scroll-icon-wrapper.burst-effect .scroll-icon {
-  animation: scrollIconPop 1s forwards;
+  animation: pendulum 1s ease-in-out;
 }
 
 @keyframes scrollIconPop {
@@ -1526,3 +1537,43 @@ body {
 
 /* ... existing styles ... */
 
+/* Flashing red background for confirmation */
+.order-item.flashing-red {
+  animation: flashRed 3s;
+}
+
+@keyframes flashRed {
+  0% { background-color: transparent; }
+  25% { background-color: rgba(255, 0, 0, 0.2); }
+  50% { background-color: transparent; }
+  75% { background-color: rgba(255, 0, 0, 0.2); }
+  100% { background-color: transparent; }
+}
+
+/* ... existing code ... */
+
+/* Add animation to scroll icon */
+.scroll-icon {
+  /* ... existing styles ... */
+  animation: scrollIconAnimation 10s infinite ease-in-out;
+}
+
+@keyframes scrollIconAnimation {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(0) rotate(-10deg) scale(1);
+  }
+  75% {
+    transform: translateY(10px) rotate(-5deg) scale(0.95);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+/* ... existing code ... */

@@ -162,7 +162,7 @@ export default function OrdersInfo({ onClose }) {
 
         {/* Past Orders Section */}
         <div className="past-orders order-status-card">
-          <h2 style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <h2 style={{ display: 'flex', alignItems: 'center', height: '100%', padding: '16px' }}>
             👨‍🍳
           </h2>
           {customerOrders.length > 0 ? (

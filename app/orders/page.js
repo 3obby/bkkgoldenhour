@@ -21,18 +21,32 @@ function LoadingDots() {
 function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
   const checkButtonRef = useRef(null);
 
+  // Add state and refs for confirmation logic
+  const [isConfirming, setIsConfirming] = useState(false);
+  const confirmTimeoutRef = useRef(null);
+
   const handleCheckButtonClick = async () => {
-    if (checkButtonRef.current) {
-      checkButtonRef.current.classList.add('clicked');
-      // Remove the class after 3 seconds (animation duration)
-      setTimeout(() => {
-        if (checkButtonRef.current) {
-          checkButtonRef.current.classList.remove('clicked');
-        }
+    if (isConfirming) {
+      // User confirmed deletion
+      clearTimeout(confirmTimeoutRef.current);
+      setIsConfirming(false);
+      await handleOrderComplete(order.id);
+    } else {
+      // Start confirmation process
+      setIsConfirming(true);
+      confirmTimeoutRef.current = setTimeout(() => {
+        // Reset confirmation after 3 seconds
+        setIsConfirming(false);
       }, 3000);
     }
-    await handleOrderComplete(order.id);
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(confirmTimeoutRef.current);
+    };
+  }, []);
 
   // Calculate the order total
   const orderTotal = order.orderItems.reduce((total, item) => {
@@ -48,16 +62,14 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
   const customerIcon = order.customer?.customerIcon || '👤';
 
   return (
-    <li className="order-item">
-      {order.status !== 'completed' && (
-        <button
-          onClick={handleCheckButtonClick}
-          className="complete-button check-button-responsive"
-          ref={checkButtonRef}
-        >
-          {loadingOrderId === order.id ? <LoadingDots /> : '✅'}
-        </button>
-      )}
+    <li className={`order-item ${isConfirming ? 'flashing-red' : ''}`}>
+      <button
+        onClick={handleCheckButtonClick}
+        className={`complete-button check-button-responsive ${isConfirming ? 'confirming' : ''}`}
+        ref={checkButtonRef}
+      >
+        {isConfirming ? '🗑️👍' : '🗑️'}
+      </button>
       <div className="order-content">
         <h2>
           #{order.id} {order.status}
@@ -118,6 +130,9 @@ export default function Orders() {
   const [hideCompleted, setHideCompleted] = useState(true);
   const [groupByCustomer, setGroupByCustomer] = useState(false);
 
+  // New state to track deleting orders
+  const [deletingOrderIds, setDeletingOrderIds] = useState([]);
+
   // Use a ref to track if it's the initial load
   const isInitialLoad = useRef(true);
 
@@ -134,7 +149,10 @@ export default function Orders() {
         const data = await response.json();
 
         if (isMounted) {
-          setOrders(data);
+          const filteredData = data.filter(
+            (order) => !deletingOrderIds.includes(order.id)
+          );
+          setOrders(filteredData);
         }
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -153,28 +171,36 @@ export default function Orders() {
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, []);
+  }, [deletingOrderIds]);
 
   const handleOrderComplete = async (orderId) => {
     setLoadingOrderId(orderId);
+
+    // Add the order ID to the deleting list and remove it from orders
+    setDeletingOrderIds((prev) => [...prev, orderId]);
+    setOrders((prevOrders) => prevOrders.filter((order) => order.id !== orderId));
+    console.log(`hid order ${orderId} while waiting for confirmation...`);
+
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'completed' }),
       });
+
       if (response.ok) {
-        // Update the order's status in the state
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order.id === orderId ? { ...order, status: 'completed' } : order
-          )
-        );
+        console.log(`order ${orderId} deleted`);
       } else {
-        console.error('Failed to update order status');
+        console.error(`Failed to update order status for order ${orderId}`);
+        // Re-add the order to the state
+        setOrders((prevOrders) => [...prevOrders, removedOrder]);
+        setDeletingOrderIds((prev) => prev.filter((id) => id !== orderId));
       }
     } catch (error) {
-      console.error('Error updating order status:', error);
+      console.error(`Error updating order status for order ${orderId}:`, error);
+      // Re-add the order to the state
+      setOrders((prevOrders) => [...prevOrders, removedOrder]);
+      setDeletingOrderIds((prev) => prev.filter((id) => id !== orderId));
     } finally {
       setLoadingOrderId(null);
     }
