@@ -1,8 +1,13 @@
                 // Start of Selection
                 import { useRef, useEffect } from 'react';
 
-                function BackgroundCanvas() {
+                function BackgroundCanvas({ speedMultiplier = 1 }) {
                   const canvasRef = useRef(null);
+                  const speedRef = useRef(speedMultiplier); // Create a ref for speedMultiplier
+
+                  useEffect(() => {
+                    speedRef.current = speedMultiplier; // Update the ref when prop changes
+                  }, [speedMultiplier]);
 
                   useEffect(() => {
                     let animationFrameId;
@@ -86,7 +91,7 @@
 
                       // Update and draw rings
                       rings.forEach((ring) => {
-                        ring.zPosition -= 0.2; // Slow movement towards the viewer
+                        ring.zPosition -= 0.2 * speedRef.current; // Use speedRef.current
 
                         // Interpolate x and y positions towards center as rings approach
                         const t = (1000 - ring.zPosition) / 1000;
@@ -128,7 +133,7 @@
                     return () => {
                       cancelAnimationFrame(animationFrameId);
                     };
-                  }, []);
+                  }, []); // Remove speedMultiplier from dependencies
 
                   return (
                     <canvas

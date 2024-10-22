@@ -84,28 +84,34 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
   // Fetch menu items when selectedCategory changes
   useEffect(() => {
-    async function fetchMenuItemsByCategory() {
-      try {
-        const url = selectedCategory
-          ? `/api/admin/menuitems?category=${encodeURIComponent(selectedCategory)}`
-          : `/api/admin/menuitems`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          setMenuItems(data);
-        } else {
-          console.error('Invalid menu data structure:', data);
-        }
-      } catch (error) {
-        console.error('Error fetching menu items:', error);
-      }
-    }
+    setIsLoading(true); // Start loading when effect runs
 
     if (selectedCategory !== '') {
+      async function fetchMenuItemsByCategory() {
+        try {
+          const url = `/api/admin/menuitems?category=${encodeURIComponent(selectedCategory)}`;
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (Array.isArray(data)) {
+            setMenuItems(data);
+          } else {
+            console.error('Invalid menu data structure:', data);
+          }
+        } catch (error) {
+          console.error('Error fetching menu items:', error);
+        } finally {
+          setIsLoading(false); // Fetch complete
+        }
+      }
+
       fetchMenuItemsByCategory();
     } else {
-      setMenuItems(initialMenuItems);
+      // Simulate loading delay to allow opacity transition
+      setTimeout(() => {
+        setMenuItems(initialMenuItems);
+        setIsLoading(false); // Transition complete
+      }, 200); // Delay matches CSS transition duration
     }
   }, [selectedCategory]);
 
@@ -219,9 +225,12 @@ export default function MenuClient({ categories, initialMenuItems }) {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(false); // Add this line
+
   return (
     <>
-      <BackgroundCanvas />
+      {/* Pass speedMultiplier to BackgroundCanvas */}
+      <BackgroundCanvas speedMultiplier={isLoading ? 10 : 1} />
       <style jsx global>{`
         @font-face {
           font-family: 'Rubik';
@@ -241,7 +250,10 @@ export default function MenuClient({ categories, initialMenuItems }) {
               <select
                 id="category-select"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setIsLoading(true); // Start loading
+                }}
                 className="select-category"
               >
                 <option value="">
@@ -305,7 +317,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
         </nav>
 
         {/* Page Content */}
-        <div className="menu-page">
+        <div className={`menu-page ${isLoading ? 'loading' : ''}`}>
           {/* Content wrapper */}
           <div
             className="content-wrapper"

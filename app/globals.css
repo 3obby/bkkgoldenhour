@@ -1602,3 +1602,14 @@ body {
 
 /* ... existing code ... */
 
+/* Adjust transition to match the JavaScript delay */
+.menu-page {
+  opacity: 1;
+  transition: opacity 0.2s ease; /* Changed from 0.15s to 0.2s */
+}
+
+.menu-page.loading {
+  opacity: 0;
+}
+
+/* ... existing code ... */
