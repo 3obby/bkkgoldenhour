@@ -2,9 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Root variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --item-footer-offset: 40%; /* Adjust this value to change the offset */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -150,6 +152,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center; /* Ensure items are centered vertically */
+  position: relative; /* Set positioning context */
+  z-index: 1; /* Higher z-index to appear above the image */
+  transform: translateY(calc(-1 * var(--item-footer-offset))); /* Move upward */
 }
 
 .item-price {
@@ -1617,3 +1622,5 @@ body {
 }
 
 /* ... existing code ... */
+
+
