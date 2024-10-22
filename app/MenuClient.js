@@ -34,7 +34,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
 
   // State and references for icon animation
   const [iconIndex, setIconIndex] = useState(0);
-  const icons = ['🥩', '🍟', '🍻', '🍰', '🍹', '🍗', '🐔', '���', '🦐', '🍤', '🥔', '🍠', '🧆', '🍝', '🐟', '🍔', '🍲', '🥭', '🟫', '🍸', '🥃', '🏺', '🍹', '💨'];
+  const icons = ['🥩', '🍟', '🍻', '🍰', '🍹', '🍗', '🐔', '🦐', '🍤', '🥔', '🍠', '🧆', '🍝', '🐟', '🍔', '🍲', '🥭', '🟫', '🍸', '🥃', '🏺', '🍹', '💨'];
   const timeoutRef = useRef(null);
 
   // State for the button click effect
@@ -53,6 +53,9 @@ export default function MenuClient({ categories, initialMenuItems }) {
   // State variable to control scroll burst effect
   const [showScrollBurst, setShowScrollBurst] = useState(false);
 
+  // Add state to control the cart appearance animation
+  const [showCartAppearanceAnimation, setShowCartAppearanceAnimation] = useState(false);
+
   // Detect when cart becomes empty to trigger burst effect
   useEffect(() => {
     if (prevOrderCount > 0 && orderCount === 0) {
@@ -63,6 +66,19 @@ export default function MenuClient({ categories, initialMenuItems }) {
       setTimeout(() => {
         setShowScrollBurst(false);
       }, 1000); // Match the duration of the burstEffectAnimation
+    }
+  }, [orderCount, prevOrderCount]);
+
+  // Detect when cart becomes non-empty to trigger appearance animation
+  useEffect(() => {
+    if (prevOrderCount === 0 && orderCount > 0) {
+      // Cart just became non-empty
+      setShowCartAppearanceAnimation(true);
+
+      // Remove the appearance animation class after the animation ends
+      setTimeout(() => {
+        setShowCartAppearanceAnimation(false);
+      }, 1000); // Match the duration of the animation
     }
   }, [orderCount, prevOrderCount]);
 
@@ -264,7 +280,7 @@ export default function MenuClient({ categories, initialMenuItems }) {
                 key={cartIconAnimationKey}
                 className={`${
                   orderCount > 0
-                    ? 'cart-icon-wrapper cart-logo-background'
+                    ? `cart-icon-wrapper cart-logo-background ${showCartAppearanceAnimation ? 'cart-appearance-animation' : ''}`
                     : 'scroll-icon-wrapper'
                 } ${cartIconAnimationKey ? 'animate-glow' : ''} ${
                   orderCount > 0 ? 'items-in-cart' : ''

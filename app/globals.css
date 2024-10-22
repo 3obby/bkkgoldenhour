@@ -942,6 +942,7 @@ body {
 
   color: gold;
   font-size: 64px;
+  margin-right: 32px;
 
   justify-content: center;
   align-items: center;
@@ -1477,3 +1478,42 @@ body {
 }
 
 /* ... existing code ... */
+
+/* Cart Appearance Animation */
+.cart-appearance-animation .cart-icon {
+  animation: cartAppear 1s ease-out forwards;
+}
+
+@keyframes cartAppear {
+  0% {
+    transform: scale(0) rotate(-360deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(20deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Optional: Add a bounce effect to the cart icon wrapper */
+.cart-appearance-animation {
+  animation: cartWrapperBounce 1s ease-out forwards;
+}
+
+@keyframes cartWrapperBounce {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ... existing styles ... */
