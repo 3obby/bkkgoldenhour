@@ -1026,6 +1026,7 @@ body {
   padding: 10px 20px;
   margin-bottom: 20px;
   color: rgb(255, 255, 255);
+  cursor: pointer;
 }
 
 .gamertag-icon {
@@ -1041,7 +1042,14 @@ body {
 }
 
 .gamertag-text {
-  font-size: 1.5em;          /* Big text for 'Anon:' and user ID */
+  font-size: 1.5em;
+}
+
+/* Emoji Picker Container */
+.emoji-picker-container {
+  position: absolute;
+  z-index: 1000;
+  top: 60px; /* Adjust based on your layout */
 }
 
 /* Loading gamertag styling */
@@ -1517,3 +1525,4 @@ body {
 }
 
 /* ... existing styles ... */
+

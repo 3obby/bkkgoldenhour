@@ -4,6 +4,7 @@ import { useState, useContext, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import { OrderContext } from '../contexts/OrderContext';
 import Image from 'next/image';
+import EmojiPicker from 'emoji-picker-react';
 
 export default function OrderModal({ onClose }) {
   const { order, removeItem, submitOrder } = useContext(OrderContext);
@@ -13,8 +14,10 @@ export default function OrderModal({ onClose }) {
   const buttonRef = useRef(null);
   const [showCommentBox, setShowCommentBox] = useState({});
   const [customerId, setCustomerId] = useState(null); // Add this line
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [customerIcon, setCustomerIcon] = useState('🙂');
 
-  // Retrieve or generate the customer ID
+  // Retrieve or generate the customer ID and icon
   useEffect(() => {
     let savedCustomerId = localStorage.getItem('customerId');
     if (!savedCustomerId) {
@@ -22,6 +25,12 @@ export default function OrderModal({ onClose }) {
       localStorage.setItem('customerId', savedCustomerId);
     }
     setCustomerId(savedCustomerId);
+
+    // Retrieve customer icon from localStorage
+    const savedCustomerIcon = localStorage.getItem('customerIcon');
+    if (savedCustomerIcon) {
+      setCustomerIcon(savedCustomerIcon);
+    }
   }, []);
 
   // Close the modal when the order is empty
@@ -85,6 +94,17 @@ export default function OrderModal({ onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div
+            className="emoji-picker-container"
+            onClick={(e) => e.stopPropagation()} // Stop click propagation
+          >
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
+          </div>
+        )}
+
         {/* Order Content */}
         {order.length === 0 ? (
           <div className="empty-cart">

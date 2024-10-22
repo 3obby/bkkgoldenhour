@@ -1,23 +1,39 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+// You might need to install an emoji picker library, e.g., react-emoji-picker
+import dynamic from 'next/dynamic';
+
+// Dynamically import the emoji picker to avoid SSR issues
+const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false });
 
 export default function OrdersInfo({ onClose }) {
   const [customerId, setCustomerId] = useState(null);
   const [isCustomerIdLoading, setIsCustomerIdLoading] = useState(true);
+  const [customerIcon, setCustomerIcon] = useState('🗿');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [customerOrders, setCustomerOrders] = useState([]);
   const [loadingText, setLoadingText] = useState('.');
+  const emojiPickerRef = useRef(null);
 
   // Generate or retrieve the customer ID
   useEffect(() => {
-    let customerId = localStorage.getItem('customerId');
-    if (!customerId) {
-      customerId = uuidv4();
-      localStorage.setItem('customerId', customerId);
+    let storedCustomerId = localStorage.getItem('customerId');
+    if (!storedCustomerId) {
+      storedCustomerId = uuidv4();
+      localStorage.setItem('customerId', storedCustomerId);
     }
-    setCustomerId(customerId);
+    setCustomerId(storedCustomerId);
     setIsCustomerIdLoading(false);
+  }, []);
+
+  // Load the customerIcon from localStorage
+  useEffect(() => {
+    const storedIcon = localStorage.getItem('customerIcon');
+    if (storedIcon) {
+      setCustomerIcon(storedIcon);
+    }
   }, []);
 
   // Loading animation for customerId
@@ -49,6 +65,47 @@ export default function OrdersInfo({ onClose }) {
     fetchCustomerOrders();
   }, [customerId]);
 
+  // Handle emoji selection
+  const handleEmojiClick = async (emojiObject) => {
+    const selectedEmoji = emojiObject.emoji;
+    setCustomerIcon(selectedEmoji);
+    setShowEmojiPicker(false);
+    // Store in localStorage
+    localStorage.setItem('customerIcon', selectedEmoji);
+
+    // Send POST request to update the customer icon in the database
+    try {
+      const response = await fetch('/api/updateCustomerIcon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customerId, customerIcon: selectedEmoji }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update customer icon');
+      }
+    } catch (error) {
+      console.error('Error updating customer icon:', error);
+    }
+  };
+
+  // Handle click outside of emoji picker to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target) &&
+        showEmojiPicker
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEmojiPicker]);
+
   // ASCII frames for the spinning cube animation
   const asciiFrames = [
     `<        >`,
@@ -64,10 +121,6 @@ export default function OrdersInfo({ onClose }) {
     `<EUPHORIA>`,
     `<        >`,
     `<EUPHORIA>`,
-
-
-
-
   ];
 
   // State to keep track of the current frame
@@ -86,28 +139,38 @@ export default function OrdersInfo({ onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-  
-
         {/* Gamertag Display */}
         {isCustomerIdLoading ? (
           <div className="gamertag-loading">
             <div className="loading-text">Loading{loadingText}</div>
           </div>
         ) : (
-          <div className="gamertag">
-            <div className="gamertag-icon">🗿</div>
+          <div className="gamertag" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+            <div className="gamertag-icon">{customerIcon}</div>
             <div className="gamertag-text">
-              Anon: {customerId.slice(0, 5)}
+              Anon: {customerId.slice(0, 7)}
             </div>
+          </div>
+        )}
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className="emoji-picker-container">
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
           </div>
         )}
 
         {/* Past Orders Section */}
         <div className="past-orders order-status-card">
-          <h2 style={{ display: 'flex', alignItems: 'center', height: '100%' }}>👨‍🍳</h2>
+          <h2 style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            👨‍🍳
+          </h2>
           {customerOrders.length > 0 ? (
             customerOrders.map((order) => (
-              <div key={order.id} className={`past-order ${order.status}`}>
+              <div
+                key={order.id}
+                className={`past-order ${order.status}`}
+              >
                 <p>
                   {order.status === 'completed' ? '👨‍🍳✅' : '⏳👨‍🍳'} Order #{order.id}
                 </p>

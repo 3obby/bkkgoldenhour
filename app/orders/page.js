@@ -1,3 +1,4 @@
+ // Start of Selection
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -43,6 +44,9 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
     return total + itemTotal + optionsTotal;
   }, 0);
 
+  // Extract customer icon
+  const customerIcon = order.customer?.customerIcon || '👤';
+
   return (
     <li className="order-item">
       {order.status !== 'completed' && (
@@ -55,21 +59,29 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
         </button>
       )}
       <div className="order-content">
-        <h2>#{order.id} {order.status}</h2>
+        <h2>
+          #{order.id} {order.status}
+        </h2>
         {order.tableNumber && <p>Table Number: {order.tableNumber}</p>}
-    
+
         <ul className="order-items-list">
           {order.orderItems.map((item) => (
             <li key={item.id} className="order-item-detail">
               <p>
-                <strong className="gold-text">{item.menuItem.name}</strong> x{item.quantity} - ${item.menuItem.price}
+                <strong className="gold-text">
+                  {item.menuItem.name}
+                </strong>{' '}
+                x{item.quantity} - ${item.menuItem.price}
               </p>
               {item.comment && <p>Comment: {item.comment}</p>}
               {item.orderItemOptions.length > 0 && (
                 <ul className="order-item-options">
                   {item.orderItemOptions.map((option) => (
                     <li key={option.id}>
-                      <span className="gold-text">{option.menuItemOption.name}</span> - ${option.menuItemOption.price}
+                      <span className="gold-text">
+                        {option.menuItemOption.name}
+                      </span>{' '}
+                      - ${option.menuItemOption.price}
                     </li>
                   ))}
                 </ul>
@@ -77,8 +89,23 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
             </li>
           ))}
         </ul>
-        {/* Display the order total */}
-        <p className="order-total" style={{ textAlign: 'right', fontSize: '1.5em', color: 'gold' }}>{orderTotal}฿</p>
+        {/* Display the order total and customer icon inline */}
+        <p
+          className="order-total"
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            fontSize: '1.5em',
+            color: 'gold',
+          }}
+        >
+          <span style={{ marginRight: '10px' }}>
+                {order.customerId?.slice(0, 7)}
+          </span>
+          <span style={{ marginRight: '10px' }}>{customerIcon}</span>
+          {orderTotal}฿
+        </p>
       </div>
     </li>
   );
@@ -207,7 +234,7 @@ export default function Orders() {
         </button>
       </nav>
       {isLoading ? (
-        <p className="orders-loading">Loading orders...</p>
+        <p className="orders-loading"><LoadingDots /></p>
       ) : filteredOrders.length === 0 ? (
         <p className="orders-empty">No orders.</p>
       ) : (
