@@ -184,17 +184,10 @@ export default function OrdersInfo({ onClose }) {
               </div>
             ))
           ) : (
-            // Display the ASCII animation when there are no past orders
-            <pre
-              style={{
-                fontSize: '22px',
-                lineHeight: '8px',
-                minHeight: '100px',
-                color: '#FF1493',
-              }}
-            >
+            // Replace the <pre> element with a <div> and apply the className "euphoria-text"
+            <div className="euphoria-text">
               {asciiFrames[currentFrame]}
-            </pre>
+            </div>
           )}
         </div>
       </div>

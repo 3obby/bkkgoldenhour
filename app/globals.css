@@ -1389,7 +1389,8 @@ body {
 
 .modal-content {
   width: 80%;
-  background-color: rgba(50, 50, 50, 0.9); /* Semi-transparent card */
+  height: 80%;
+  background-color: rgba(50, 50, 50, 0.95); /* Semi-transparent card */
   max-width: 90%;
   max-height: 80vh;
   overflow-y: auto;
@@ -1544,9 +1545,9 @@ body {
 
 @keyframes flashRed {
   0% { background-color: transparent; }
-  25% { background-color: rgba(255, 0, 0, 0.2); }
+  25% { background-color: rgba(0, 255, 0, 0.2); }
   50% { background-color: transparent; }
-  75% { background-color: rgba(255, 0, 0, 0.2); }
+  75% { background-color: rgba(0, 255, 0, 0.2); }
   100% { background-color: transparent; }
 }
 
@@ -1577,3 +1578,27 @@ body {
 }
 
 /* ... existing code ... */
+
+/* Styles for the EUPHORIA text */
+.euphoria-text {
+  font-size: 32px; /* Increase text size */
+  font-family: 'Courier New', monospace; /* Use monospace font */
+  white-space: pre; /* Preserve spaces */
+  line-height: 1;
+  color: #ff1493; /* Neon pink color */
+  text-align: center;
+  padding: 20px 40px;
+  background-color: #1a1a1a; /* Match the background canvas color */
+  border-radius: 50px; /* Pill-shaped rounded rectangle */
+  display: inline-block;
+  margin: 20px auto;
+  text-shadow:
+    0 0 5px #ff1493,
+    0 0 10px #ff1493,
+    0 0 20px #ff1493,
+    0 0 40px #ff1493,
+    0 0 80px #ff1493;
+}
+
+/* ... existing code ... */
+

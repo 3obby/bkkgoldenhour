@@ -63,13 +63,15 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
 
   return (
     <li className={`order-item ${isConfirming ? 'flashing-red' : ''}`}>
-      <button
-        onClick={handleCheckButtonClick}
-        className={`complete-button check-button-responsive ${isConfirming ? 'confirming' : ''}`}
-        ref={checkButtonRef}
-      >
-        {isConfirming ? '🗑️👍' : '🗑️'}
-      </button>
+      {order.status !== 'completed' && (
+        <button
+          onClick={handleCheckButtonClick}
+          className={`complete-button check-button-responsive ${isConfirming ? 'confirming' : ''}`}
+          ref={checkButtonRef}
+        >
+          {isConfirming ? '❎' : '👍'}
+        </button>
+      )}
       <div className="order-content">
         <h2>
           #{order.id} {order.status}
@@ -108,15 +110,17 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
             display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',
-            fontSize: '1.5em',
-            color: 'gold',
+          
           }}
         >
           <span style={{ marginRight: '10px' }}>
                 {order.customerId?.slice(0, 7)}
           </span>
           <span style={{ marginRight: '10px' }}>{customerIcon}</span>
-          {orderTotal}฿
+          <span style={{   fontSize: '1.5em',
+            color: 'gold' }}>
+            {orderTotal}฿
+          </span>
         </p>
       </div>
     </li>
@@ -129,6 +133,7 @@ export default function Orders() {
   const [loadingOrderId, setLoadingOrderId] = useState(null);
   const [hideCompleted, setHideCompleted] = useState(true);
   const [groupByCustomer, setGroupByCustomer] = useState(false);
+  const [secondsUntilNextUpdate, setSecondsUntilNextUpdate] = useState(3);
 
   // New state to track deleting orders
   const [deletingOrderIds, setDeletingOrderIds] = useState([]);
@@ -165,11 +170,17 @@ export default function Orders() {
     }
 
     fetchOrders();
-    const intervalId = setInterval(fetchOrders, 3000);
+    const intervalId = setInterval(fetchOrders, 15000);
+
+    // Update seconds until next update
+    const countdownIntervalId = setInterval(() => {
+      setSecondsUntilNextUpdate((prev) => (prev > 0 ? prev - 1 : 15));
+    }, 1000);
 
     return () => {
       isMounted = false;
       clearInterval(intervalId);
+      clearInterval(countdownIntervalId);
     };
   }, [deletingOrderIds]);
 
@@ -255,14 +266,27 @@ export default function Orders() {
         <button
           onClick={() => setHideCompleted(!hideCompleted)}
           className="toggle-button emoji-button"
+          style={{
+        margin: '16px',
+          }}
         >
           {hideCompleted ? '💾' : '✅'}
         </button>
+        <span className="update-countdown" style={{
+            width: '100%',
+          color: 'gold',
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+          {secondsUntilNextUpdate}
+        </span>
       </nav>
       {isLoading ? (
         <p className="orders-loading"><LoadingDots /></p>
       ) : filteredOrders.length === 0 ? (
-        <p className="orders-empty">No orders.</p>
+        <div className="flex items-center justify-center h-full">
+          <p className="orders-empty">👀...</p>
+        </div>
       ) : (
         <div className="orders-list">
           {ordersContent}
