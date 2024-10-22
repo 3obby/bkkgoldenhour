@@ -190,6 +190,15 @@ export default function OrderModal({ onClose }) {
                 </li>
               ))}
             </ul>
+            {/* Total Price Display */}
+            <div className="mt-6 mb-4">
+              <h2 className="text-4xl font-bold text-center">
+                <span className="text-yellow-400">
+                  {order.reduce((total, item) => total + (item.price * item.quantity), 0)}
+                </span>
+                <span className="text-white">฿</span>
+              </h2>
+            </div>
 
             {/* Submit Order Button */}
             <div className="submit-button-container-new">
