@@ -951,11 +951,11 @@ body {
 /* Background colors based on status */
 .past-order.pending,
 .past-order.in-progress {
-  background-color: yellow;
+  background-color: rgba(255, 255, 0, 0.65);
 }
 
 .past-order.completed {
-  background-color: green;
+  background-color: rgba(0, 128, 0, 0.95);
 }
 
 .loading-animation {
@@ -1023,7 +1023,7 @@ body {
   display: flex;
   align-items: center;
   background-color: #2d2d2d; /* Dark background for the gamertag */
-  padding: 10px 20px;
+  padding: 20px 40px;
   margin-bottom: 20px;
   color: rgb(255, 255, 255);
   cursor: pointer;
