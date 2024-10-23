@@ -69,6 +69,8 @@ model Order {
   tableNumber Int?
   customerId  String?   // Add this line
   customer    Customer? @relation(fields: [customerId], references: [id])
+  x           Float     
+  z           Float 
 
   orderItems  OrderItem[]
 }

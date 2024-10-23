@@ -14,10 +14,11 @@ export default function OrderModal({ onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const buttonRef = useRef(null);
   const [showCommentBox, setShowCommentBox] = useState({});
-  const [customerId, setCustomerId] = useState(null); // Add this line
+  const [customerId, setCustomerId] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [customerIcon, setCustomerIcon] = useState('🙂');
   const [showClubMap, setShowClubMap] = useState(false);
+  const [coordinates, setCoordinates] = useState(null); // Add this line
 
   // Retrieve or generate the customer ID and icon
   useEffect(() => {
@@ -51,13 +52,11 @@ export default function OrderModal({ onClose }) {
 
     setIsLoading(true);
     try {
-      // Pass customerId to submitOrder
-      await submitOrder(null, comments, selectedOptions, customerId);
-      // Close the modal after submission
+      // Pass coordinates along with other parameters
+      await submitOrder(null, comments, selectedOptions, customerId, coordinates);
       onClose();
     } catch (error) {
       console.error(error);
-      // Handle error if needed
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +106,8 @@ export default function OrderModal({ onClose }) {
           </div>
         )}
 
+
+
         {/* Order Content */}
         {order.length === 0 ? (
           <div className="empty-cart">
@@ -115,20 +116,8 @@ export default function OrderModal({ onClose }) {
         ) : (
             
           <div className="order-card">
-            {/* Add this wrapper div */}
-            <div className="map-icon-container">
-              <button onClick={() => setShowClubMap(true)} className="map-icon">
-                🗺️
-              </button>
-            </div>
-            {/* Render the ClubMap component when showClubMap is true */}
-            {showClubMap && (
-              <ClubMap
-                onClose={() => setShowClubMap(false)}
-                darkenFloor={true}
-                addTinyCube={true}
-              />
-            )}
+            {/* Map Icon and Coordinates */}
+           
             <ul className="order-list-new">
               {order.map((item) => (
                 <li key={item.id} className="order-item-row-new">
@@ -216,23 +205,45 @@ export default function OrderModal({ onClose }) {
                 <span className="text-white">฿</span>
               </h2>
             </div>
-
-            {/* Submit Order Button */}
-            <div className="submit-button-container-new">
-              {isLoading ? (
-                <div className="loading-animation">⏳</div>
-              ) : (
-                <button
-                  onClick={handleButtonClick}
-                  className="submit-button-new"
-                  ref={buttonRef}
-                >
-                  👍👨‍🍳
-                </button>
-              )}
-            </div>
           </div>
         )}
+                {/* Club Map */}
+                {showClubMap && (
+          <ClubMap
+            onClose={() => setShowClubMap(false)}
+            setCoordinates={setCoordinates} // Pass setCoordinates prop
+          />
+        )}
+         <div className="map-icon-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <button onClick={() => setShowClubMap(true)} className="map-icon">
+                🗺️
+              </button>
+              {/* Display coordinates if they exist */}
+              {coordinates && (
+                <span className="coordinates-display" style={{
+                  color: '#ff1493',
+                  marginTop: '5px',
+                  textAlign: 'center'
+                }}>
+                  ({coordinates.x}, {coordinates.z})
+                </span>
+              )}
+            </div>
+            {coordinates && (
+              <div className="submit-button-container-new">
+                {isLoading ? (
+                  <div className="loading-animation">⏳</div>
+                ) : (
+                  <button
+                    onClick={handleButtonClick}
+                    className="submit-button-new"
+                    ref={buttonRef}
+                  >
+                    👍👨‍🍳
+                  </button>
+                )}
+              </div>
+            )}
       </div>
     </div>
   );

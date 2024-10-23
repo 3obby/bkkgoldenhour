@@ -1479,7 +1479,6 @@ body {
   opacity: 0;
   animation: slideIn 0.1s forwards;
   position: relative;
-  align-content: space-evenly;
 }
 
 /* Close button style */

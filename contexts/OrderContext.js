@@ -4,7 +4,7 @@ import React, { createContext, useState, useEffect } from 'react';
 
 export const OrderContext = createContext();
 
-export const OrderProvider = ({ children }) => {
+export function OrderProvider({ children }) {
   const orderKey = 'currentOrder';
   const [order, setOrder] = useState(null); // Initialize to null
 
@@ -44,30 +44,40 @@ export const OrderProvider = ({ children }) => {
     localStorage.removeItem(orderKey);
   };
 
-  const submitOrder = async (tableNumber, comments, selectedOptions, customerId) => {
+  const submitOrder = async (
+    tableNumber,
+    comments,
+    selectedOptions,
+    customerId,
+    coordinates
+  ) => {
     try {
-      const orderData = order.map((item) => ({
-        ...item,
-        comment: comments[item.id] || null,
-        selectedOptionId: selectedOptions[item.id] || null,
-      }));
+      const orderData = {
+        customerId,
+        x: parseFloat(coordinates?.x || 0),
+        z: parseFloat(coordinates?.z || 0),
+        orderItems: order.map((item) => ({
+          menuItemId: item.id, // Ensure menuItemId is set correctly
+          quantity: item.quantity,
+          comment: comments[item.id] || null,
+          selectedOptionId: selectedOptions[item.id] || null,
+        })),
+      };
 
-      const response = await fetch('/api/submitOrder', {
+      const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderItems: orderData,
-          tableNumber,
-          customerId, // Include customerId here
-        }),
+        body: JSON.stringify(orderData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       const data = await response.json();
       console.log('Order submitted:', data);
       clearOrder();
-      return data; // Return the response data
+      return data;
     } catch (error) {
       console.error('Submission error:', error);
-      throw error; // Re-throw error to be handled by the caller
+      throw error;
     }
   };
 
@@ -78,9 +88,15 @@ export const OrderProvider = ({ children }) => {
 
   return (
     <OrderContext.Provider
-      value={{ order, addItem, removeItem, clearOrder, submitOrder }}
+      value={{
+        order,
+        setOrder,
+        addItem,
+        removeItem,
+        submitOrder,
+      }}
     >
       {children}
     </OrderContext.Provider>
   );
-};
+}

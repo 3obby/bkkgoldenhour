@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-export default function ClubMap({ onClose }) {
+export default function ClubMap({ onClose, setCoordinates }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -14,6 +14,9 @@ export default function ClubMap({ onClose }) {
 
   // Add state variable to track if there's an existing ping
   const [hasPing, setHasPing] = useState(false);
+
+  // Add state variable to store the selected point
+  const [selectedPoint, setSelectedPoint] = useState(null);
 
   useEffect(() => {
     const currentMount = mountRef.current;
@@ -430,6 +433,9 @@ export default function ClubMap({ onClose }) {
     if (floorIntersect) {
       const point = floorIntersect.point;
 
+      // Store the selected point in state
+      setSelectedPoint(point);
+
       // Create white 'ping' effect at the point
       const pingGeometry = new THREE.RingGeometry(0.9, 1.35, 32);
       const pingMaterial = new THREE.MeshBasicMaterial({
@@ -558,14 +564,24 @@ export default function ClubMap({ onClose }) {
 
   // Add function to handle the '👆✅' button click
   const handleConfirm = () => {
-    // Your logic when the button is clicked
-    // For example, reset the ping and state
-    setHasPing(false); // Reset hasPing state
+    // Ensure that a point has been selected
+    if (selectedPoint) {
+      const xCoord = selectedPoint.x.toFixed(2);
+      const zCoord = selectedPoint.z.toFixed(2);
+
+      // Pass the coordinates back to the parent component
+      setCoordinates({ x: xCoord, z: zCoord });
+    }
 
     // Remove existing ping and related resources
     if (currentPingRef.current) {
-      const { ping, emojiSprite, textSprite, bobbingAnimationId, pingAnimationId } =
-        currentPingRef.current;
+      const {
+        ping,
+        emojiSprite,
+        textSprite,
+        bobbingAnimationId,
+        pingAnimationId,
+      } = currentPingRef.current;
 
       if (ping) {
         sceneRef.current.remove(ping);
@@ -584,6 +600,10 @@ export default function ClubMap({ onClose }) {
       }
       currentPingRef.current = null;
     }
+
+    // Reset the ping state and close the map
+    setHasPing(false);
+    onClose();
   };
 
   return (
@@ -600,7 +620,7 @@ export default function ClubMap({ onClose }) {
           style={{ width: '100%', height: '100%' }}
         ></div>
 
-        {!hasPing && (
+     
           <div
             style={{
               position: 'absolute',
@@ -612,8 +632,9 @@ export default function ClubMap({ onClose }) {
             }}
           >
             🫵❓
-          </div>
-        )}
+            </div>
+    
+  
 
         {hasPing && (
           <button
