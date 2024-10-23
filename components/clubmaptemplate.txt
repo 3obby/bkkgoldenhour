@@ -1,0 +1,12 @@
+  const templateData = `
+    X X X X X X X 💨 💨 💨
+    X 🍻 🍻 🍻 🍻 🍻 X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    `;

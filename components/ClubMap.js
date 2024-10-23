@@ -6,7 +6,7 @@ export default function ClubMap({ onClose }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
-  const currentPingRef = useRef(null);
+  const currentPingRef = useRef(null); // Keep as an object to store ping components
   const animationRef = useRef(null); // For animation frame
   const timeRef = useRef(0); // Track animation time
   const wallsRef = useRef([]); // Track wall meshes
@@ -22,6 +22,7 @@ export default function ClubMap({ onClose }) {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
+    // Adjust the camera's field of view (FOV) if necessary
     const camera = new THREE.PerspectiveCamera(
       45,
       currentMount.clientWidth / currentMount.clientHeight,
@@ -80,68 +81,187 @@ export default function ClubMap({ onClose }) {
       }, 3000); // 3 seconds of inactivity
     });
 
-    // Remove or comment out the AxesHelper
+    // Remove or comment out the AxesHelper if not needed
     // const axesHelper = new THREE.AxesHelper(30);
     // scene.add(axesHelper);
 
-    const radius = 38;
-    const roomSize = 15;
+    const radius = 20; // Decrease the radius to zoom in closer
+    const roomSize = 10; // Room size remains the same
+    const wallHeight = 3; // Wall height remains the same
 
     // Create walls
-    const wallGeometry = new THREE.PlaneGeometry(roomSize, roomSize/3);
+    const wallGeometry = new THREE.PlaneGeometry(roomSize, wallHeight);
     const wallMaterial = new THREE.MeshBasicMaterial({
       color: 0x007F00,
       wireframe: true,
       transparent: true,
-      opacity: 0.15,
-      side: THREE.DoubleSide
+      opacity: 0.5,
+      side: THREE.DoubleSide,
     });
 
-    // Create 4 walls
+    // Create walls without divisions
     const walls = [];
-    for (let i = 0; i < 4; i++) {
-      const wall = new THREE.Mesh(wallGeometry, wallMaterial.clone());
- 
-      walls.push(wall);
-      scene.add(wall);
-    }
 
-    // Position walls
-    walls[0].position.z = roomSize / 2;
-    walls[1].position.x = roomSize / 2;
-    walls[1].rotation.y = Math.PI / 2;
-    walls[2].position.z = -roomSize / 2;
-    walls[3].position.x = -roomSize / 2;
-    walls[3].rotation.y = Math.PI / 2;
+    // Front Wall
+    const frontWall = new THREE.Mesh(wallGeometry, wallMaterial.clone());
+    frontWall.position.set(0, 0, 5);
+    walls.push(frontWall);
+    scene.add(frontWall);
+
+    // Right Wall
+    const rightWall = new THREE.Mesh(wallGeometry, wallMaterial.clone());
+    rightWall.position.set(5, 0, 0);
+    rightWall.rotation.y = Math.PI / 2;
+    walls.push(rightWall);
+    scene.add(rightWall);
+
+    // Back Wall
+    const backWall = new THREE.Mesh(wallGeometry, wallMaterial.clone());
+    backWall.position.set(0, 0, -5); // Positioned at z = -5
+    walls.push(backWall);
+    scene.add(backWall);
+
+    // Left Wall
+    const leftWall = new THREE.Mesh(wallGeometry, wallMaterial.clone());
+    leftWall.position.set(-5, 0, 0); // Positioned at x = -5
+    leftWall.rotation.y = Math.PI / 2;
+    walls.push(leftWall);
+    scene.add(leftWall);
 
     wallsRef.current = walls;
 
-    // Add a neon green plane within the boundaries of the cube at y=0 (this is the ground)
-    const planeGeometry = new THREE.PlaneGeometry(roomSize, roomSize);
-    const planeMaterial = new THREE.MeshBasicMaterial({
-      color: 0x007F00,
-      side: THREE.DoubleSide,
-    });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-    plane.position.y = 0.01;
-    scene.add(plane);
+    // Load and parse the template data
+    const templateData = `
+    X X X X X X X 💨 💨 💨
+    X 🍻 🍻 🍻 🍻 🍻 X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X X X 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    X X X X X 🪜 🪜 💨 💨 💨
+    `;
 
-    // Assign the plane to pickableObjects.current
-    pickableObjects.current = [plane]; // <-- Keep this line
+    // Parse the template data into an array of rows and columns
+    const templateRows = templateData
+    .trim()
+    .split('\n')
+    .map((line) =>
+      line
+        .trim()
+        .split(/\s+/) // Split by whitespace
+        .map((symbol) => symbol || 'X')
+    );
+    // Set the desired grid size
+    const gridRows = 10;
+    const gridCols = 10;
 
-    // Add a smaller cube on the floor as wireframe with same green color
-    const smallCubeGeometry = new THREE.BoxGeometry(3, 1, 3);
-    const smallCubeMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0x00ff00,
-      wireframe: true 
-    });
-    // const demosmallcube = new THREE.Mesh(smallCubeGeometry, smallCubeMaterial);
-    // demosmallcube.position.set(0, 1.5, 0);
-    // scene.add(demosmallcube);
+    // Create a 10x10 grid filled with empty tiles ('X')
+    const gridData = Array.from({ length: gridRows }, () => Array(gridCols).fill('X'));
 
-    // Initial camera position
-    camera.position.set(radius * Math.sin(Math.PI / 4), 20, radius * Math.cos(Math.PI / 4));
+    // Overlay the template data onto the grid, centered
+    const templateRowsCount = templateRows.length;
+    const templateColsCount = Math.max(...templateRows.map(row => row.length));
+
+    const rowOffset = Math.floor((gridRows - templateRowsCount) / 2);
+    const colOffset = Math.floor((gridCols - templateColsCount) / 2);
+
+    for (let row = 0; row < templateRowsCount; row++) {
+      const templateRow = templateRows[row];
+      for (let col = 0; col < templateRow.length; col++) {
+        const symbol = templateRow[col] || 'X'; // Default to 'X' if undefined
+        const gridRow = row + rowOffset;
+        const gridCol = col + colOffset;
+        if (
+          gridRow >= 0 &&
+          gridRow < gridRows &&
+          gridCol >= 0 &&
+          gridCol < gridCols
+        ) {
+          gridData[gridRow][gridCol] = symbol;
+        }
+      }
+    }
+
+    // Instead of a single floor plane, create a grid of tiles based on the gridData
+    const tileSize = roomSize / gridCols; // Size allocated per tile
+    const tileScaleFactor = 0.9; // Tiles will be 90% of the allocated size
+    const tileGeometrySize = tileSize * tileScaleFactor; // Actual size of each tile
+    const tiles = []; // To store all tile meshes
+
+    // Create the grid of tiles based on gridData
+    for (let row = 0; row < gridRows; row++) {
+      for (let col = 0; col < gridCols; col++) {
+        const symbol = gridData[row][col];
+
+        // Create tile geometry
+        const tileGeometry = new THREE.PlaneGeometry(
+          tileGeometrySize,
+          tileGeometrySize
+        );
+
+        // Create a canvas texture with the symbol
+        const canvasSize = 128; // Size of the canvas
+        const textCanvas = document.createElement('canvas');
+        textCanvas.width = canvasSize;
+        textCanvas.height = canvasSize;
+        const textContext = textCanvas.getContext('2d');
+
+        // Fill background color to match tile color
+        textContext.fillStyle = '#004e00'; // Match tile color
+        textContext.fillRect(0, 0, canvasSize, canvasSize);
+
+        // Draw the symbol if it's not 'X'
+        if (symbol !== 'X') {
+          textContext.fillStyle = '#000000'; // Black color
+          textContext.font = `${canvasSize * 0.8}px Arial`;
+          textContext.textAlign = 'center';
+          textContext.textBaseline = 'middle';
+          textContext.fillText(symbol, canvasSize / 2, canvasSize / 2);
+        }
+        // If symbol is 'X', leave it as an empty tile
+
+        // Create a texture from the canvas
+        const tileTexture = new THREE.CanvasTexture(textCanvas);
+        tileTexture.minFilter = THREE.LinearFilter;
+
+        // Create tile material with the texture
+        const tileMaterial = new THREE.MeshBasicMaterial({
+          map: tileTexture,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 1,
+        });
+
+        // Create the tile mesh
+        const tile = new THREE.Mesh(tileGeometry, tileMaterial);
+
+        // Calculate the position of the tile
+        const adjustedCol = gridCols - 1 - col;
+        const xPos = -roomSize / 2 + tileSize / 2 + adjustedCol * tileSize;
+        const zPos = roomSize / 2 - tileSize / 2 - row * tileSize;
+
+        tile.position.set(xPos, 0.02, zPos); // Slightly above y=0 to "float"
+
+        // Rotate to be horizontal
+        tile.rotation.x = -Math.PI / 2;
+
+        scene.add(tile);
+        tiles.push(tile);
+      }
+    }
+
+    // Assign the tiles to pickableObjects.current
+    pickableObjects.current = tiles;
+
+    // Initial camera position (Zoomed in)
+    camera.position.set(
+      radius * Math.sin(Math.PI / 4),
+      8, // Lower the y-position to zoom in vertically
+      radius * Math.cos(Math.PI / 4)
+    );
     camera.lookAt(0, 0, 0);
 
     // Animation loop with camera control
@@ -160,30 +280,40 @@ export default function ClubMap({ onClose }) {
         const t = Math.min(elapsedTime / transitionDuration, 1);
 
         // Easing function for smooth interpolation
-        const easeInOutQuad = t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        const easeInOutQuad = (t) =>
+          t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         const easedT = easeInOutQuad(t);
 
         // Compute target camera position and quaternion for automatic rotation
         const tempTime = timeRef.current + deltaTime * fullRotationSpeed;
 
-        const baseRadius = radius + Math.sin(tempTime * 0.5) * 5; // Breathing zoom effect
-        const heightOffset = Math.sin(tempTime * 0.7) * 3; // Gentle bobbing
+        const baseRadius =
+          radius + Math.sin(tempTime * 0.5) * 2; // Adjusted zoom effect
+        const heightOffset = Math.sin(tempTime * 0.7) * 1; // Adjusted bobbing
         const angle = tempTime;
 
         targetPosition.set(
           baseRadius * Math.sin(angle),
-          20 + heightOffset,
+          8 + heightOffset, // Adjusted height
           baseRadius * Math.cos(angle)
         );
 
         // Calculate the target quaternion
         targetQuaternion.setFromRotationMatrix(
-          new THREE.Matrix4().lookAt(targetPosition, new THREE.Vector3(0, 0, 0), camera.up)
+          new THREE.Matrix4().lookAt(
+            targetPosition,
+            new THREE.Vector3(0, 0, 0),
+            camera.up
+          )
         );
 
         // Interpolate position and quaternion
         camera.position.lerpVectors(startPosition, targetPosition, easedT);
-        camera.quaternion.slerpQuaternions(startQuaternion, targetQuaternion, easedT);
+        camera.quaternion.slerpQuaternions(
+          startQuaternion,
+          targetQuaternion,
+          easedT
+        );
 
         if (t >= 1) {
           // Transition complete
@@ -197,14 +327,15 @@ export default function ClubMap({ onClose }) {
         timeRef.current += deltaTime * fullRotationSpeed;
 
         // Calculate camera position for automatic rotation
-        const baseRadius = radius + Math.sin(timeRef.current * 0.5) * 5; // Breathing zoom effect
-        const heightOffset = Math.sin(timeRef.current * 0.7) * 3; // Gentle bobbing
+        const baseRadius =
+          radius + Math.sin(timeRef.current * 0.5) * 2; // Adjusted zoom effect
+        const heightOffset = Math.sin(timeRef.current * 0.7) * 1; // Adjusted bobbing
         const angle = timeRef.current;
 
         // Update camera position
         camera.position.set(
           baseRadius * Math.sin(angle),
-          20 + heightOffset,
+          8 + heightOffset, // Adjusted height
           baseRadius * Math.cos(angle)
         );
 
@@ -217,6 +348,17 @@ export default function ClubMap({ onClose }) {
     };
 
     animate();
+    // Create background layer
+    const backgroundGeometry = new THREE.PlaneGeometry(roomSize, roomSize);
+    const backgroundMaterial = new THREE.MeshBasicMaterial({
+        color: '#ed4984',
+        side: THREE.DoubleSide,
+      });
+    const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+    const backgroundPlane = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+    backgroundPlane.rotation.x = -Math.PI / 2;
+  backgroundPlane.position.y = 0.01; // Slightly below the bottom green tiles
+  scene.add(backgroundPlane);
 
     // Handle window resize
     const handleResize = () => {
@@ -258,30 +400,34 @@ export default function ClubMap({ onClose }) {
     const intersects = raycaster.intersectObjects(pickableObjects.current);
 
     // Find intersection with the floor plane specifically
-    const floorIntersect = intersects.find(intersect => 
+    const floorIntersect = intersects.find((intersect) =>
       intersect.object.geometry instanceof THREE.PlaneGeometry
     );
 
-    // Remove existing ping and emoji sprite if there is one
+    // Remove existing ping and related resources if there is one
     if (currentPingRef.current) {
-      sceneRef.current.remove(currentPingRef.current);
-      if (currentPingRef.current.emojiSprite) {
-        sceneRef.current.remove(currentPingRef.current.emojiSprite);
+      const { ping, emojiSprite, textSprite, bobbingAnimationId, pingAnimationId } =
+        currentPingRef.current;
+
+      if (ping) {
+        sceneRef.current.remove(ping);
       }
-      if (currentPingRef.current.bobbingAnimationId) {
-        cancelAnimationFrame(currentPingRef.current.bobbingAnimationId);
+      if (emojiSprite) {
+        sceneRef.current.remove(emojiSprite);
       }
-      if (currentPingRef.current.pingAnimationId) {
-        cancelAnimationFrame(currentPingRef.current.pingAnimationId);
+      if (textSprite) {
+        sceneRef.current.remove(textSprite);
       }
+      if (bobbingAnimationId) {
+        cancelAnimationFrame(bobbingAnimationId);
+      }
+      if (pingAnimationId) {
+        cancelAnimationFrame(pingAnimationId);
+      }
+      currentPingRef.current = null; // Reset the reference
     }
 
     if (floorIntersect) {
-      // Remove existing ping if there is one
-      if (currentPingRef.current) {
-        sceneRef.current.remove(currentPingRef.current);
-      }
-
       const point = floorIntersect.point;
 
       // Create white 'ping' effect at the point
@@ -293,15 +439,15 @@ export default function ClubMap({ onClose }) {
       });
       const ping = new THREE.Mesh(pingGeometry, pingMaterial);
       ping.position.copy(point);
-      ping.position.y = 0.02;
+      ping.position.y += 0.3;
       ping.rotation.x = -Math.PI / 2;
       sceneRef.current.add(ping);
-      currentPingRef.current = ping;
 
       // Animate the ping effect continuously but slower
       let scale = 1;
+      let pingAnimationId;
       const pingAnimate = function () {
-        scale += 0.02;
+        scale += 0.01;
         ping.scale.set(scale, scale, scale);
         ping.material.opacity = 1 - (scale - 1);
         if (ping.material.opacity <= 0) {
@@ -309,7 +455,7 @@ export default function ClubMap({ onClose }) {
           ping.scale.set(scale, scale, scale);
           ping.material.opacity = 1;
         }
-        requestAnimationFrame(pingAnimate);
+        pingAnimationId = requestAnimationFrame(pingAnimate);
       };
       pingAnimate();
 
@@ -343,20 +489,68 @@ export default function ClubMap({ onClose }) {
       // Add the sprite to the scene
       sceneRef.current.add(emojiSprite);
 
-      // Store reference to the sprite and animations for cleanup
-      currentPingRef.current.emojiSprite = emojiSprite;
-
       // Animate the sprite to bob up and down
       let bobbingOffset = 0;
       const bobbingSpeed = 0.05;
+      let bobbingAnimationId;
 
       const bobbingAnimate = function () {
         bobbingOffset += bobbingSpeed;
         emojiSprite.position.y = point.y + 2 + Math.sin(bobbingOffset) * 0.2;
-        currentPingRef.current.bobbingAnimationId = requestAnimationFrame(bobbingAnimate);
+        bobbingAnimationId = requestAnimationFrame(bobbingAnimate);
       };
 
       bobbingAnimate();
+
+      // Create a canvas to render the coordinates text
+      const textCanvas = document.createElement('canvas');
+      textCanvas.width = 256;
+      textCanvas.height = 64;
+      const textContext = textCanvas.getContext('2d');
+
+      // Set font properties
+      textContext.font = 'Bold 24px Arial';
+      textContext.fillStyle = '#ffffff'; // White color
+      textContext.textAlign = 'center';
+      textContext.textBaseline = 'middle';
+
+      // Prepare the text showing x and z coordinates, rounded to two decimal places
+      const xCoord = point.x.toFixed(2);
+      const zCoord = point.z.toFixed(2);
+      const coordText = `X: ${xCoord}, Z: ${zCoord}`;
+
+      // Fill text into the canvas
+      textContext.fillText(coordText, textCanvas.width / 2, textCanvas.height / 2);
+
+      // Create a texture from the canvas
+      const textTexture = new THREE.CanvasTexture(textCanvas);
+      textTexture.minFilter = THREE.LinearFilter; // Improve text quality
+
+      // Create a sprite material with the texture
+      const textMaterial = new THREE.SpriteMaterial({
+        map: textTexture,
+        transparent: true,
+      });
+
+      // Create the sprite
+      const textSprite = new THREE.Sprite(textMaterial);
+
+      // Position the sprite near the emoji sprite
+      textSprite.position.copy(point);
+      textSprite.position.y += 3.5; // Adjust height as needed (above the emoji)
+      textSprite.scale.set(4, 1, 1); // Adjust size as needed
+
+      // Add the sprite to the scene
+      sceneRef.current.add(textSprite);
+
+      // Store all references in currentPingRef.current for cleanup
+      currentPingRef.current = {
+        ping,
+        emojiSprite,
+        textSprite,
+        bobbingAnimationId,
+        pingAnimationId,
+      };
 
       setHasPing(true); // Set hasPing to true when a ping is created
     }
@@ -368,17 +562,25 @@ export default function ClubMap({ onClose }) {
     // For example, reset the ping and state
     setHasPing(false); // Reset hasPing state
 
-    // Remove existing ping and emoji
+    // Remove existing ping and related resources
     if (currentPingRef.current) {
-      sceneRef.current.remove(currentPingRef.current);
-      if (currentPingRef.current.emojiSprite) {
-        sceneRef.current.remove(currentPingRef.current.emojiSprite);
+      const { ping, emojiSprite, textSprite, bobbingAnimationId, pingAnimationId } =
+        currentPingRef.current;
+
+      if (ping) {
+        sceneRef.current.remove(ping);
       }
-      if (currentPingRef.current.bobbingAnimationId) {
-        cancelAnimationFrame(currentPingRef.current.bobbingAnimationId);
+      if (emojiSprite) {
+        sceneRef.current.remove(emojiSprite);
       }
-      if (currentPingRef.current.pingAnimationId) {
-        cancelAnimationFrame(currentPingRef.current.pingAnimationId);
+      if (textSprite) {
+        sceneRef.current.remove(textSprite);
+      }
+      if (bobbingAnimationId) {
+        cancelAnimationFrame(bobbingAnimationId);
+      }
+      if (pingAnimationId) {
+        cancelAnimationFrame(pingAnimationId);
       }
       currentPingRef.current = null;
     }
@@ -389,7 +591,7 @@ export default function ClubMap({ onClose }) {
       <div
         className="club-map-content"
         onClick={(e) => e.stopPropagation()}
-        style={{ position: 'relative' }} // Ensure position is relative
+        style={{ position: 'relative' }}
       >
         <div
           ref={mountRef}
@@ -416,7 +618,7 @@ export default function ClubMap({ onClose }) {
         {hasPing && (
           <button
             className="submit-button-new"
-            onClick={handleConfirm} // Add onClick handler
+            onClick={handleConfirm}
             style={{
               position: 'absolute',
               bottom: '25%',
@@ -424,7 +626,6 @@ export default function ClubMap({ onClose }) {
               transform: 'translateX(-50%)',
               fontSize: '3em',
               zIndex: 10,
-              // Remove pointerEvents: 'none' to make it clickable
             }}
           >
             👆✅
