@@ -122,7 +122,13 @@ export default function OrderModal({ onClose }) {
               </button>
             </div>
             {/* Render the ClubMap component when showClubMap is true */}
-            {showClubMap && <ClubMap onClose={() => setShowClubMap(false)} />}
+            {showClubMap && (
+              <ClubMap
+                onClose={() => setShowClubMap(false)}
+                darkenFloor={true}
+                addTinyCube={true}
+              />
+            )}
             <ul className="order-list-new">
               {order.map((item) => (
                 <li key={item.id} className="order-item-row-new">

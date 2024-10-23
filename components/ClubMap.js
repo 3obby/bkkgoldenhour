@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -11,6 +11,9 @@ export default function ClubMap({ onClose }) {
   const timeRef = useRef(0); // Track animation time
   const wallsRef = useRef([]); // Track wall meshes
   const pickableObjects = useRef([]); // Correctly define pickableObjects with useRef
+
+  // Add state variable to track if there's an existing ping
+  const [hasPing, setHasPing] = useState(false);
 
   useEffect(() => {
     const currentMount = mountRef.current;
@@ -259,6 +262,20 @@ export default function ClubMap({ onClose }) {
       intersect.object.geometry instanceof THREE.PlaneGeometry
     );
 
+    // Remove existing ping and emoji sprite if there is one
+    if (currentPingRef.current) {
+      sceneRef.current.remove(currentPingRef.current);
+      if (currentPingRef.current.emojiSprite) {
+        sceneRef.current.remove(currentPingRef.current.emojiSprite);
+      }
+      if (currentPingRef.current.bobbingAnimationId) {
+        cancelAnimationFrame(currentPingRef.current.bobbingAnimationId);
+      }
+      if (currentPingRef.current.pingAnimationId) {
+        cancelAnimationFrame(currentPingRef.current.pingAnimationId);
+      }
+    }
+
     if (floorIntersect) {
       // Remove existing ping if there is one
       if (currentPingRef.current) {
@@ -295,18 +312,125 @@ export default function ClubMap({ onClose }) {
         requestAnimationFrame(pingAnimate);
       };
       pingAnimate();
+
+      // Create a canvas to render the emoji
+      const emojiCanvas = document.createElement('canvas');
+      emojiCanvas.width = 64;
+      emojiCanvas.height = 64;
+      const emojiContext = emojiCanvas.getContext('2d');
+      emojiContext.font = '48px Arial';
+      emojiContext.textAlign = 'center';
+      emojiContext.textBaseline = 'middle';
+      emojiContext.fillText('👇', 32, 32);
+
+      // Create a texture from the canvas
+      const emojiTexture = new THREE.CanvasTexture(emojiCanvas);
+
+      // Create a sprite material with the texture
+      const emojiMaterial = new THREE.SpriteMaterial({
+        map: emojiTexture,
+        transparent: true,
+      });
+
+      // Create the sprite
+      const emojiSprite = new THREE.Sprite(emojiMaterial);
+
+      // Position the sprite above the ping
+      emojiSprite.position.copy(point);
+      emojiSprite.position.y += 2; // Adjust height as needed
+      emojiSprite.scale.set(2, 2, 1); // Adjust size as needed
+
+      // Add the sprite to the scene
+      sceneRef.current.add(emojiSprite);
+
+      // Store reference to the sprite and animations for cleanup
+      currentPingRef.current.emojiSprite = emojiSprite;
+
+      // Animate the sprite to bob up and down
+      let bobbingOffset = 0;
+      const bobbingSpeed = 0.05;
+
+      const bobbingAnimate = function () {
+        bobbingOffset += bobbingSpeed;
+        emojiSprite.position.y = point.y + 2 + Math.sin(bobbingOffset) * 0.2;
+        currentPingRef.current.bobbingAnimationId = requestAnimationFrame(bobbingAnimate);
+      };
+
+      bobbingAnimate();
+
+      setHasPing(true); // Set hasPing to true when a ping is created
+    }
+  };
+
+  // Add function to handle the '👆✅' button click
+  const handleConfirm = () => {
+    // Your logic when the button is clicked
+    // For example, reset the ping and state
+    setHasPing(false); // Reset hasPing state
+
+    // Remove existing ping and emoji
+    if (currentPingRef.current) {
+      sceneRef.current.remove(currentPingRef.current);
+      if (currentPingRef.current.emojiSprite) {
+        sceneRef.current.remove(currentPingRef.current.emojiSprite);
+      }
+      if (currentPingRef.current.bobbingAnimationId) {
+        cancelAnimationFrame(currentPingRef.current.bobbingAnimationId);
+      }
+      if (currentPingRef.current.pingAnimationId) {
+        cancelAnimationFrame(currentPingRef.current.pingAnimationId);
+      }
+      currentPingRef.current = null;
     }
   };
 
   return (
     <div className="club-map-overlay" onClick={onClose}>
-      <div className="club-map-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="club-map-content"
+        onClick={(e) => e.stopPropagation()}
+        style={{ position: 'relative' }} // Ensure position is relative
+      >
         <div
           ref={mountRef}
           className="club-map"
           onClick={handleClick}
           style={{ width: '100%', height: '100%' }}
         ></div>
+
+        {!hasPing && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '25%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '3em',
+              zIndex: 10,
+            }}
+          >
+            🫵❓
+          </div>
+        )}
+
+        {hasPing && (
+          <button
+            className="submit-button-new"
+            onClick={handleConfirm} // Add onClick handler
+            style={{
+              position: 'absolute',
+              bottom: '25%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '3em',
+              zIndex: 10,
+              // Remove pointerEvents: 'none' to make it clickable
+            }}
+          >
+            👆✅
+          </button>
+        )}
+
         <button className="close-button" onClick={onClose} style={{ color: 'white' }}>
           X
         </button>
