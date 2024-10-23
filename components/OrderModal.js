@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import { OrderContext } from '../contexts/OrderContext';
 import Image from 'next/image';
 import EmojiPicker from 'emoji-picker-react';
+import ClubMap from './ClubMap';
 
 export default function OrderModal({ onClose }) {
   const { order, removeItem, submitOrder } = useContext(OrderContext);
@@ -16,6 +17,7 @@ export default function OrderModal({ onClose }) {
   const [customerId, setCustomerId] = useState(null); // Add this line
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [customerIcon, setCustomerIcon] = useState('🙂');
+  const [showClubMap, setShowClubMap] = useState(false);
 
   // Retrieve or generate the customer ID and icon
   useEffect(() => {
@@ -111,7 +113,16 @@ export default function OrderModal({ onClose }) {
             <p>Your cart is empty.</p>
           </div>
         ) : (
+            
           <div className="order-card">
+            {/* Add this wrapper div */}
+            <div className="map-icon-container">
+              <button onClick={() => setShowClubMap(true)} className="map-icon">
+                🗺️
+              </button>
+            </div>
+            {/* Render the ClubMap component when showClubMap is true */}
+            {showClubMap && <ClubMap onClose={() => setShowClubMap(false)} />}
             <ul className="order-list-new">
               {order.map((item) => (
                 <li key={item.id} className="order-item-row-new">

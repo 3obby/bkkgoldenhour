@@ -255,6 +255,50 @@ body {
   align-items: center;
 }
 
+.map-icon {
+  font-size: 4em;
+  position: relative;
+  display: inline-block;
+  animation: mapIconFloat 3s ease-in-out infinite, mapIconSpawnIn 1s ease-out;
+  opacity: 1;
+}
+
+.map-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
+  z-index: -1;
+  border-radius: 50%;
+  animation: mapIconGlow 2s ease-in-out infinite;
+}
+
+@keyframes mapIconFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(5px, -5px) rotate(5deg); }
+  50% { transform: translate(0, -10px) rotate(0deg); }
+  75% { transform: translate(-5px, -5px) rotate(-5deg); }
+}
+
+@keyframes mapIconGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes mapIconSpawnIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 .emoji-icon {
   font-size: 1.5em;
 }
@@ -441,7 +485,38 @@ body {
   align-items: center;
   justify-content: center;
 }
-
+.club-map-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+.club-map-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #032700ba;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.club-map {
+  flex: 1; /* Take up remaining space */
+  width: 100%;
+  height: 100%;
+}
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+}
 /* Order list */
 .order-list-new {
   list-style: none;
@@ -1619,6 +1694,20 @@ body {
 
 .menu-page.loading {
   opacity: 0;
+}
+
+/* ... existing code ... */
+
+/* Add styles for the map icon container */
+.map-icon-container {
+  display: flex;
+  justify-content: center; /* Center the map button */
+  margin: 20px 0; /* Add vertical spacing */
+}
+
+/* Optionally adjust the map icon style */
+.map-icon {
+  margin: 0 auto; /* Ensure the icon is centered inside the container */
 }
 
 /* ... existing code ... */
