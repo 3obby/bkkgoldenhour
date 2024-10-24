@@ -18,6 +18,10 @@ export default function ClubMap({ onClose, setCoordinates }) {
   // Add state variable to store the selected point
   const [selectedPoint, setSelectedPoint] = useState(null);
 
+  // Add these refs at the top level of your component
+  const pingScaleRef = useRef(1);
+  const bobbingOffsetRef = useRef(0);
+
   useEffect(() => {
     const currentMount = mountRef.current;
 
@@ -272,10 +276,10 @@ export default function ClubMap({ onClose, setCoordinates }) {
       // Get the time elapsed since the last frame
       const deltaTime = clock.getDelta();
 
-      requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
 
+      // Camera controls update
       if (isUserInteracting) {
-        // User is interacting
         controls.update();
       } else if (isTransitioning) {
         // Transitioning back to automatic rotation
@@ -346,7 +350,33 @@ export default function ClubMap({ onClose, setCoordinates }) {
         camera.lookAt(0, 0, 0);
       }
 
-      // Render scene
+      // **Ping effect animation**
+      if (currentPingRef.current) {
+        const { ping, emojiSprite } = currentPingRef.current;
+
+        // Update ping scaling and opacity
+        if (ping) {
+          pingScaleRef.current += 0.01;
+          const scale = pingScaleRef.current;
+          ping.scale.set(scale, scale, scale);
+          ping.material.opacity = 1 - (scale - 1);
+          if (ping.material.opacity <= 0) {
+            pingScaleRef.current = 1;
+            ping.scale.set(1, 1, 1);
+            ping.material.opacity = 1;
+          }
+        }
+
+        // Update emoji sprite bobbing animation
+        if (emojiSprite) {
+          bobbingOffsetRef.current += 0.05; // bobbingSpeed
+          emojiSprite.position.y =
+            emojiSprite.userData.baseY +
+            Math.sin(bobbingOffsetRef.current) * 0.2;
+        }
+      }
+
+      // Render the scene
       renderer.render(scene, camera);
     };
 
@@ -392,8 +422,10 @@ export default function ClubMap({ onClose, setCoordinates }) {
 
     const rect = mountRef.current.getBoundingClientRect();
     const mouse = new THREE.Vector2();
-    mouse.x = ((event.clientX - rect.left) / mountRef.current.clientWidth) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / mountRef.current.clientHeight) * 2 + 1;
+    mouse.x =
+      ((event.clientX - rect.left) / mountRef.current.clientWidth) * 2 - 1;
+    mouse.y =
+      -((event.clientY - rect.top) / mountRef.current.clientHeight) * 2 + 1;
 
     // Raycasting to find intersecting objects
     const raycaster = new THREE.Raycaster();
@@ -403,162 +435,62 @@ export default function ClubMap({ onClose, setCoordinates }) {
     const intersects = raycaster.intersectObjects(pickableObjects.current);
 
     // Find intersection with the floor plane specifically
-    const floorIntersect = intersects.find((intersect) =>
-      intersect.object.geometry instanceof THREE.PlaneGeometry
+    const floorIntersect = intersects.find(
+      (intersect) => intersect.object.geometry instanceof THREE.PlaneGeometry
     );
-
-    // Remove existing ping and related resources if there is one
-    if (currentPingRef.current) {
-      const { ping, emojiSprite, textSprite, bobbingAnimationId, pingAnimationId } =
-        currentPingRef.current;
-
-      if (ping) {
-        sceneRef.current.remove(ping);
-      }
-      if (emojiSprite) {
-        sceneRef.current.remove(emojiSprite);
-      }
-      if (textSprite) {
-        sceneRef.current.remove(textSprite);
-      }
-      if (bobbingAnimationId) {
-        cancelAnimationFrame(bobbingAnimationId);
-      }
-      if (pingAnimationId) {
-        cancelAnimationFrame(pingAnimationId);
-      }
-      currentPingRef.current = null; // Reset the reference
-    }
 
     if (floorIntersect) {
       const point = floorIntersect.point;
 
-      // Store the selected point in state
-      setSelectedPoint(point);
+      // **Check if the point is within x and z between -5 and +5**
+      if (
+        point.x >= -5 &&
+        point.x <= 5 &&
+        point.z >= -5 &&
+        point.z <= 5
+      ) {
+        // **Remove existing ping and related resources if there is one**
+        if (currentPingRef.current) {
+          const { ping, emojiSprite, textSprite } = currentPingRef.current;
 
-      // Create white 'ping' effect at the point
-      const pingGeometry = new THREE.RingGeometry(0.9, 1.35, 32);
-      const pingMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        side: THREE.DoubleSide,
-        transparent: true,
-      });
-      const ping = new THREE.Mesh(pingGeometry, pingMaterial);
-      ping.position.copy(point);
-      ping.position.y += 0.3;
-      ping.rotation.x = -Math.PI / 2;
-      sceneRef.current.add(ping);
-
-      // Animate the ping effect continuously but slower
-      let scale = 1;
-      let pingAnimationId;
-      const pingAnimate = function () {
-        scale += 0.01;
-        ping.scale.set(scale, scale, scale);
-        ping.material.opacity = 1 - (scale - 1);
-        if (ping.material.opacity <= 0) {
-          scale = 1;
-          ping.scale.set(scale, scale, scale);
-          ping.material.opacity = 1;
+          if (ping) {
+            sceneRef.current.remove(ping);
+          }
+          if (emojiSprite) {
+            sceneRef.current.remove(emojiSprite);
+          }
+          if (textSprite) {
+            sceneRef.current.remove(textSprite);
+          }
+          currentPingRef.current = null; // Reset the reference
         }
-        pingAnimationId = requestAnimationFrame(pingAnimate);
-      };
-      pingAnimate();
 
-      // Create a canvas to render the emoji
-      const emojiCanvas = document.createElement('canvas');
-      emojiCanvas.width = 64;
-      emojiCanvas.height = 64;
-      const emojiContext = emojiCanvas.getContext('2d');
-      emojiContext.font = '48px Arial';
-      emojiContext.textAlign = 'center';
-      emojiContext.textBaseline = 'middle';
-      emojiContext.fillText('👇', 32, 32);
+        // **Store the selected point in state**
+        setSelectedPoint(point);
 
-      // Create a texture from the canvas
-      const emojiTexture = new THREE.CanvasTexture(emojiCanvas);
+        // **Create the new ping effect**
+        // Create white 'ping' effect at the point
+        const pingGeometry = new THREE.RingGeometry(0.9, 1.35, 32);
+        const pingMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          side: THREE.DoubleSide,
+          transparent: true,
+        });
+        const ping = new THREE.Mesh(pingGeometry, pingMaterial);
+        ping.position.copy(point);
+        ping.position.y += 0.3;
+        ping.rotation.x = -Math.PI / 2;
+        sceneRef.current.add(ping);
 
-      // Create a sprite material with the texture
-      const emojiMaterial = new THREE.SpriteMaterial({
-        map: emojiTexture,
-        transparent: true,
-      });
+        // No need for separate animation loops; animations are handled in the main animate function
+        currentPingRef.current = {
+          ping,
+          emojiSprite: createEmojiSprite(point),
+          textSprite: createTextSprite(point),
+        };
 
-      // Create the sprite
-      const emojiSprite = new THREE.Sprite(emojiMaterial);
-
-      // Position the sprite above the ping
-      emojiSprite.position.copy(point);
-      emojiSprite.position.y += 2; // Adjust height as needed
-      emojiSprite.scale.set(2, 2, 1); // Adjust size as needed
-
-      // Add the sprite to the scene
-      sceneRef.current.add(emojiSprite);
-
-      // Animate the sprite to bob up and down
-      let bobbingOffset = 0;
-      const bobbingSpeed = 0.05;
-      let bobbingAnimationId;
-
-      const bobbingAnimate = function () {
-        bobbingOffset += bobbingSpeed;
-        emojiSprite.position.y = point.y + 2 + Math.sin(bobbingOffset) * 0.2;
-        bobbingAnimationId = requestAnimationFrame(bobbingAnimate);
-      };
-
-      bobbingAnimate();
-
-      // Create a canvas to render the coordinates text
-      const textCanvas = document.createElement('canvas');
-      textCanvas.width = 256;
-      textCanvas.height = 64;
-      const textContext = textCanvas.getContext('2d');
-
-      // Set font properties
-      textContext.font = 'Bold 24px Arial';
-      textContext.fillStyle = '#ffffff'; // White color
-      textContext.textAlign = 'center';
-      textContext.textBaseline = 'middle';
-
-      // Prepare the text showing x and z coordinates, rounded to two decimal places
-      const xCoord = point.x.toFixed(2);
-      const zCoord = point.z.toFixed(2);
-      const coordText = `X: ${xCoord}, Z: ${zCoord}`;
-
-      // Fill text into the canvas
-      textContext.fillText(coordText, textCanvas.width / 2, textCanvas.height / 2);
-
-      // Create a texture from the canvas
-      const textTexture = new THREE.CanvasTexture(textCanvas);
-      textTexture.minFilter = THREE.LinearFilter; // Improve text quality
-
-      // Create a sprite material with the texture
-      const textMaterial = new THREE.SpriteMaterial({
-        map: textTexture,
-        transparent: true,
-      });
-
-      // Create the sprite
-      const textSprite = new THREE.Sprite(textMaterial);
-
-      // Position the sprite near the emoji sprite
-      textSprite.position.copy(point);
-      textSprite.position.y += 3.5; // Adjust height as needed (above the emoji)
-      textSprite.scale.set(4, 1, 1); // Adjust size as needed
-
-      // Add the sprite to the scene
-      sceneRef.current.add(textSprite);
-
-      // Store all references in currentPingRef.current for cleanup
-      currentPingRef.current = {
-        ping,
-        emojiSprite,
-        textSprite,
-        bobbingAnimationId,
-        pingAnimationId,
-      };
-
-      setHasPing(true); // Set hasPing to true when a ping is created
+        setHasPing(true); // Set hasPing to true when a ping is created
+      }
     }
   };
 
@@ -575,13 +507,7 @@ export default function ClubMap({ onClose, setCoordinates }) {
 
     // Remove existing ping and related resources
     if (currentPingRef.current) {
-      const {
-        ping,
-        emojiSprite,
-        textSprite,
-        bobbingAnimationId,
-        pingAnimationId,
-      } = currentPingRef.current;
+      const { ping, emojiSprite, textSprite } = currentPingRef.current;
 
       if (ping) {
         sceneRef.current.remove(ping);
@@ -592,19 +518,101 @@ export default function ClubMap({ onClose, setCoordinates }) {
       if (textSprite) {
         sceneRef.current.remove(textSprite);
       }
-      if (bobbingAnimationId) {
-        cancelAnimationFrame(bobbingAnimationId);
-      }
-      if (pingAnimationId) {
-        cancelAnimationFrame(pingAnimationId);
-      }
-      currentPingRef.current = null;
+
+      currentPingRef.current = null; // Reset the reference
     }
 
     // Reset the ping state and close the map
     setHasPing(false);
     onClose();
   };
+
+  // **Helper functions to create sprites**
+  function createEmojiSprite(point) {
+    // Create a canvas to render the emoji
+    const emojiCanvas = document.createElement('canvas');
+    emojiCanvas.width = 64;
+    emojiCanvas.height = 64;
+    const emojiContext = emojiCanvas.getContext('2d');
+    emojiContext.font = '48px Arial';
+    emojiContext.textAlign = 'center';
+    emojiContext.textBaseline = 'middle';
+    emojiContext.fillText('👇', 32, 32);
+
+    // Create a texture from the canvas
+    const emojiTexture = new THREE.CanvasTexture(emojiCanvas);
+
+    // Create a sprite material with the texture
+    const emojiMaterial = new THREE.SpriteMaterial({
+      map: emojiTexture,
+      transparent: true,
+    });
+
+    // Create the sprite
+    const emojiSprite = new THREE.Sprite(emojiMaterial);
+
+    // Position the sprite above the ping
+    emojiSprite.position.copy(point);
+    emojiSprite.position.y += 2; // Adjust height as needed
+    emojiSprite.scale.set(2, 2, 1); // Adjust size as needed
+
+    // Store the base Y position for bobbing animation
+    emojiSprite.userData.baseY = emojiSprite.position.y;
+
+    // Add the sprite to the scene
+    sceneRef.current.add(emojiSprite);
+
+    return emojiSprite;
+  }
+
+  function createTextSprite(point) {
+    // Create a canvas to render the coordinates text
+    const textCanvas = document.createElement('canvas');
+    textCanvas.width = 256;
+    textCanvas.height = 64;
+    const textContext = textCanvas.getContext('2d');
+
+    // Set font properties
+    textContext.font = 'Bold 24px Arial';
+    textContext.fillStyle = '#ffffff'; // White color
+    textContext.textAlign = 'center';
+    textContext.textBaseline = 'middle';
+
+    // Prepare the text showing x and z coordinates, rounded to two decimal places
+    const xCoord = point.x.toFixed(2);
+    const zCoord = point.z.toFixed(2);
+    const coordText = `X: ${xCoord}, Z: ${zCoord}`;
+
+    // Fill text into the canvas
+    textContext.fillText(
+      coordText,
+      textCanvas.width / 2,
+      textCanvas.height / 2
+    );
+
+    // Create a texture from the canvas
+    const textTexture = new THREE.CanvasTexture(textCanvas);
+    textTexture.minFilter = THREE.LinearFilter; // Improve text quality
+
+    // Create a sprite material with the texture
+    const textMaterial = new THREE.SpriteMaterial({
+      map: textTexture,
+      transparent: true,
+    });
+
+    // Create the sprite
+    const textSprite = new THREE.Sprite(textMaterial);
+
+    // Position the sprite near the emoji sprite
+    textSprite.position.copy(point);
+    textSprite.position.y += 3.5; // Adjust height as needed (above the emoji)
+    textSprite.scale.set(4, 1, 1); // Adjust size as needed
+
+    // Add the sprite to the scene
+    sceneRef.current.add(textSprite);
+
+    return textSprite;
+  }
 
   return (
     <div className="club-map-overlay" onClick={onClose}>
@@ -645,11 +653,35 @@ export default function ClubMap({ onClose, setCoordinates }) {
               bottom: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: '3em',
+              fontSize: '2em',
               zIndex: 10,
             }}
           >
-            👆✅
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <span style={{ fontSize: '2em' }}>🗺️</span>
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '25%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 1,
+                }}
+              >
+                📍
+              </span>
+            </div>
+            <span
+              style={{
+                position: 'absolute',
+                top: '65%',
+                left: '80%',
+                transform: 'translate(-50%, -50%) rotate(-13deg)',
+                zIndex: 2,
+              }}
+            >
+              ✅
+            </span>
           </button>
         )}
 

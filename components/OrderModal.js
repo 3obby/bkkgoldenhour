@@ -215,7 +215,7 @@ export default function OrderModal({ onClose }) {
           />
         )}
          <div className="map-icon-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <button onClick={() => setShowClubMap(true)} className="map-icon">
+              <button onClick={() => setShowClubMap(true)} className={`map-icon ${!coordinates ? 'submit-button-new' : ''}`}>
                 🗺️
               </button>
               {/* Display coordinates if they exist */}
