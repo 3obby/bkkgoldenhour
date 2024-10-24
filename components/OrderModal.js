@@ -211,7 +211,11 @@ export default function OrderModal({ onClose }) {
                 {showClubMap && (
           <ClubMap
             onClose={() => setShowClubMap(false)}
-            setCoordinates={setCoordinates} // Pass setCoordinates prop
+            setCoordinates={setCoordinates}
+            comments={comments}
+            selectedOptions={selectedOptions}
+            customerId={customerId}
+            onCloseOrderModal={onClose}
           />
         )}
          <div className="map-icon-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

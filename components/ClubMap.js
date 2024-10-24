@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrderContext } from '../contexts/OrderContext'; // Import OrderContext
 
-export default function ClubMap({ onClose, setCoordinates }) {
+export default function ClubMap({ onClose, setCoordinates, comments, selectedOptions, customerId, onCloseOrderModal }) {
   const mountRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
@@ -24,6 +25,12 @@ export default function ClubMap({ onClose, setCoordinates }) {
 
   // Add a ref to store emoji sprites
   const emojiSpritesRef = useRef([]);
+
+  const { order, removeItem, submitOrder } = useContext(OrderContext); // Access OrderContext
+
+  // Add state for loading and submission complete
+  const [isLoading, setIsLoading] = useState(false);
+  const [submissionComplete, setSubmissionComplete] = useState(false);
 
   useEffect(() => {
     const currentMount = mountRef.current;
@@ -511,37 +518,54 @@ export default function ClubMap({ onClose, setCoordinates }) {
     }
   };
 
-  // Add function to handle the '👆✅' button click
-  const handleConfirm = () => {
+  // Modify the handleConfirm function
+  const handleConfirm = async () => {
     // Ensure that a point has been selected
     if (selectedPoint) {
       const xCoord = selectedPoint.x.toFixed(2);
       const zCoord = selectedPoint.z.toFixed(2);
 
-      // Pass the coordinates back to the parent component
-      setCoordinates({ x: xCoord, z: zCoord });
+      setIsLoading(true);
+
+      try {
+        // Call submitOrder from context
+        await submitOrder(null, comments, selectedOptions, customerId, { x: xCoord, z: zCoord });
+
+        setIsLoading(false);
+        setSubmissionComplete(true);
+
+        // Remove existing ping and related resources
+        if (currentPingRef.current) {
+          const { ping, emojiSprite, textSprite } = currentPingRef.current;
+
+          if (ping) {
+            sceneRef.current.remove(ping);
+          }
+          if (emojiSprite) {
+            sceneRef.current.remove(emojiSprite);
+          }
+          if (textSprite) {
+            sceneRef.current.remove(textSprite);
+          }
+
+          currentPingRef.current = null; // Reset the reference
+        }
+
+        // Wait for 1 second before closing both modals
+        setTimeout(() => {
+          setHasPing(false);
+          setSubmissionComplete(false);
+          onClose(); // Close ClubMap
+          if (onCloseOrderModal) {
+            onCloseOrderModal(); // Close OrderModal
+          }
+        }, 1000);
+
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     }
-
-    // Remove existing ping and related resources
-    if (currentPingRef.current) {
-      const { ping, emojiSprite, textSprite } = currentPingRef.current;
-
-      if (ping) {
-        sceneRef.current.remove(ping);
-      }
-      if (emojiSprite) {
-        sceneRef.current.remove(emojiSprite);
-      }
-      if (textSprite) {
-        sceneRef.current.remove(textSprite);
-      }
-
-      currentPingRef.current = null; // Reset the reference
-    }
-
-    // Reset the ping state and close the map
-    setHasPing(false);
-    onClose();
   };
 
   // **Helper functions to create sprites**
@@ -713,44 +737,61 @@ export default function ClubMap({ onClose, setCoordinates }) {
   
 
         {hasPing && (
-          <button
-            className="submit-button-new"
-            onClick={handleConfirm}
+          <div
             style={{
               position: 'absolute',
               bottom: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: '2em',
               zIndex: 10,
             }}
           >
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <span style={{ fontSize: '2em' }}>🗺️</span>
-              <span
+            {isLoading ? (
+              <div className="loading-animation">⏳</div>
+            ) : submissionComplete ? (
+              <div>🧑‍🍳👍</div>
+            ) : (
+              <button
+                className="submit-button-new"
+                onClick={handleConfirm}
                 style={{
                   position: 'absolute',
-                  top: '25%',
+                  bottom: '15%',
                   left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 1,
+                  transform: 'translateX(-50%)',
+                  fontSize: '2em',
+                  zIndex: 10,
                 }}
               >
-                📍
-              </span>
-            </div>
-            <span
-              style={{
-                position: 'absolute',
-                top: '65%',
-                left: '80%',
-                transform: 'translate(-50%, -50%) rotate(-13deg)',
-                zIndex: 2,
-              }}
-            >
-              ✅
-            </span>
-          </button>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <span style={{ fontSize: '2em' }}>🗺️</span>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '25%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: 1,
+                    }}
+                  >
+                    📍
+                  </span>
+                </div>
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '65%',
+                    left: '80%',
+                    transform: 'translate(-50%, -50%) rotate(-13deg)',
+                    zIndex: 2,
+                    width: '100px',
+                  }}
+                >
+                  👨‍🍳👍
+                </span>
+              </button>
+            )}
+          </div>
         )}
 
         <button className="close-button" onClick={onClose} style={{ color: 'white' }}>
