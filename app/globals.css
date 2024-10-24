@@ -162,6 +162,7 @@ body {
   font-weight: bold;
   color: white;
   text-align: center;
+  padding-bottom: 14px;
 }
 
 .add-button {
@@ -1013,7 +1014,7 @@ body {
 /* Past Orders Items Styling */
 .past-order-items {
   list-style: none;
-  padding-left: 0;
+  padding-left: 20px;
   margin: 10px 0;
   display: flex;
   flex-direction: column;
