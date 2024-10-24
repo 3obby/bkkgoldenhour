@@ -263,6 +263,14 @@ body {
   opacity: 1;
 }
 
+.map-icon-steady {
+  font-size: 3em;
+  position: relative;
+  display: inline-block;
+  opacity: 1;
+  margin: 16px;
+}
+
 .map-icon::before {
   content: '';
   position: absolute;
@@ -1696,6 +1704,7 @@ body {
 
 /* ... existing code ... */
 
+
 /* Add styles for the map icon container */
 .map-icon-container {
   display: flex;
@@ -1707,7 +1716,5 @@ body {
 .map-icon {
   margin: 0 auto; /* Ensure the icon is centered inside the container */
 }
-
-/* ... existing code ... */
 
 

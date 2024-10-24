@@ -25,6 +25,9 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
   const [isConfirming, setIsConfirming] = useState(false);
   const confirmTimeoutRef = useRef(null);
 
+  // Add state to manage the modal visibility
+  const [isGridModalOpen, setIsGridModalOpen] = useState(false);
+
   const handleCheckButtonClick = async () => {
     if (isConfirming) {
       // User confirmed deletion
@@ -61,6 +64,47 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
   // Extract customer icon
   const customerIcon = order.customer?.customerIcon || '👤';
 
+  // Function to render the grid
+  const renderGrid = () => {
+    const gridSize = 10;
+    const grid = [];
+
+    // Initialize grid with 'X's
+    for (let y = 0; y < gridSize; y++) {
+      const row = [];
+      for (let x = 0; x < gridSize; x++) {
+        row.push('X');
+      }
+      grid.push(row);
+    }
+
+    // Map the order onto the grid based on x and z (y) coordinates
+    const xIndex = Math.round(order.x + 5);
+    const yIndex = Math.round(order.z + 5); // z is y
+
+    if (
+      xIndex >= 0 && xIndex < gridSize &&
+      yIndex >= 0 && yIndex < gridSize
+    ) {
+      grid[yIndex][xIndex] = order.customer?.customerIcon || '👤';
+    }
+
+    // Render the grid
+    return (
+      <div className="grid-container">
+        {grid.map((row, rowIndex) => (
+          <div key={rowIndex} className="grid-row">
+            {row.map((cell, colIndex) => (
+              <div key={colIndex} className="grid-cell">
+                {cell !== 'X' ? cell : ''}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <li className={`order-item ${isConfirming ? 'flashing-red' : ''}`}>
       {order.status !== 'completed' && (
@@ -72,6 +116,13 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
           {isConfirming ? '❎' : '👍'}
         </button>
       )}
+      <button
+        onClick={() => setIsGridModalOpen(true)}
+        className="grid-button"
+      >
+        Open Grid
+      </button>
+
       <div className="order-content">
         <h2>
           #{order.id} {order.status}
@@ -123,6 +174,21 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
           </span>
         </p>
       </div>
+
+      {/* Modal for displaying the grid */}
+      {isGridModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {renderGrid()}
+            <button
+              onClick={() => setIsGridModalOpen(false)}
+              className="modal-close-button"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </li>
   );
 }
@@ -280,6 +346,7 @@ export default function Orders() {
         }}>
           {secondsUntilNextUpdate}
         </span>
+
       </nav>
       {isLoading ? (
         <p className="orders-loading"><LoadingDots /></p>

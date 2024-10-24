@@ -624,14 +624,14 @@ export default function ClubMap({ onClose, setCoordinates }) {
           <div
             style={{
               position: 'absolute',
-              top: '25%',
+              top: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: '3em',
               zIndex: 10,
             }}
           >
-            🫵❓
+            🫵🗺️❓
             </div>
     
   
@@ -642,7 +642,7 @@ export default function ClubMap({ onClose, setCoordinates }) {
             onClick={handleConfirm}
             style={{
               position: 'absolute',
-              bottom: '25%',
+              bottom: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: '3em',
