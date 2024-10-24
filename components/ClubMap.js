@@ -703,7 +703,7 @@ export default function ClubMap({ onClose, setCoordinates }) {
               top: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: '3em',
+              fontSize: '2.2em',
               zIndex: 10,
             }}
           >
