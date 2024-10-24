@@ -22,6 +22,9 @@ export default function ClubMap({ onClose, setCoordinates }) {
   const pingScaleRef = useRef(1);
   const bobbingOffsetRef = useRef(0);
 
+  // Add a ref to store emoji sprites
+  const emojiSpritesRef = useRef([]);
+
   useEffect(() => {
     const currentMount = mountRef.current;
 
@@ -143,12 +146,12 @@ export default function ClubMap({ onClose, setCoordinates }) {
     X 🍻 🍻 🍻 🍻 🍻 X 💨 💨 💨
     X X X X X X X 💨 💨 💨
     X X X X X X X 💨 💨 💨
+    X X 🪑 🪑 X X X 💨 💨 💨
     X X X X X X X 💨 💨 💨
-    X X X X X X X 💨 💨 💨
-    X X X X X X X 💨 💨 💨
+    X 🪑 🪑 X X X X 💨 💨 💨
     X X X X X 🪜 🪜 💨 💨 💨
     X X X X X 🪜 🪜 💨 💨 💨
-    X X X X X 🪜 🪜 💨 💨 💨
+    X X 🪑 🪑 X 🪜 🪜 💨 💨 💨
     `;
 
     // Parse the template data into an array of rows and columns
@@ -198,6 +201,9 @@ export default function ClubMap({ onClose, setCoordinates }) {
     const tileGeometrySize = tileSize * tileScaleFactor; // Actual size of each tile
     const tiles = []; // To store all tile meshes
 
+    // Initialize emoji sprites array
+    emojiSpritesRef.current = [];
+
     // Create the grid of tiles based on gridData
     for (let row = 0; row < gridRows; row++) {
       for (let col = 0; col < gridCols; col++) {
@@ -209,34 +215,9 @@ export default function ClubMap({ onClose, setCoordinates }) {
           tileGeometrySize
         );
 
-        // Create a canvas texture with the symbol
-        const canvasSize = 128; // Size of the canvas
-        const textCanvas = document.createElement('canvas');
-        textCanvas.width = canvasSize;
-        textCanvas.height = canvasSize;
-        const textContext = textCanvas.getContext('2d');
-
-        // Fill background color to match tile color
-        textContext.fillStyle = '#004e00'; // Match tile color
-        textContext.fillRect(0, 0, canvasSize, canvasSize);
-
-        // Draw the symbol if it's not 'X'
-        if (symbol !== 'X') {
-          textContext.fillStyle = '#000000'; // Black color
-          textContext.font = `${canvasSize * 0.8}px Arial`;
-          textContext.textAlign = 'center';
-          textContext.textBaseline = 'middle';
-          textContext.fillText(symbol, canvasSize / 2, canvasSize / 2);
-        }
-        // If symbol is 'X', leave it as an empty tile
-
-        // Create a texture from the canvas
-        const tileTexture = new THREE.CanvasTexture(textCanvas);
-        tileTexture.minFilter = THREE.LinearFilter;
-
-        // Create tile material with the texture
+        // Create tile material without symbols
         const tileMaterial = new THREE.MeshBasicMaterial({
-          map: tileTexture,
+          color: '#004e00', // Tile color
           side: THREE.DoubleSide,
           transparent: true,
           opacity: 1,
@@ -247,8 +228,10 @@ export default function ClubMap({ onClose, setCoordinates }) {
 
         // Calculate the position of the tile
         const adjustedCol = gridCols - 1 - col;
-        const xPos = -roomSize / 2 + tileSize / 2 + adjustedCol * tileSize;
-        const zPos = roomSize / 2 - tileSize / 2 - row * tileSize;
+        const xPos =
+          -roomSize / 2 + tileSize / 2 + adjustedCol * tileSize;
+        const zPos =
+          roomSize / 2 - tileSize / 2 - row * tileSize;
 
         tile.position.set(xPos, 0.02, zPos); // Slightly above y=0 to "float"
 
@@ -257,6 +240,24 @@ export default function ClubMap({ onClose, setCoordinates }) {
 
         scene.add(tile);
         tiles.push(tile);
+
+        // If the tile has a symbol, create an emoji sprite above it
+        if (symbol !== 'X') {
+          createEmojiSpriteAtPosition(symbol, xPos, zPos);
+
+          // **Add neon green wireframe cube for '🍻' symbols**
+          if (symbol === '🍻') {
+            const cubeSize = tileGeometrySize; // Same size as the tile
+            const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+            const cubeMaterial = new THREE.MeshBasicMaterial({
+              color: 0x39ff14, // Neon green color
+              wireframe: true,
+            });
+            const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.position.set(xPos, cubeSize / 2, zPos); // Position it on the ground
+            scene.add(cube);
+          }
+        }
       }
     }
 
@@ -376,6 +377,23 @@ export default function ClubMap({ onClose, setCoordinates }) {
         }
       }
 
+      // Animate emoji sprites
+      emojiSpritesRef.current.forEach((emojiSprite) => {
+        // Update rotation around Y-axis
+        emojiSprite.rotation.y += emojiSprite.userData.rotationSpeed;
+
+        // Apply bobbing only if enabled
+        if (emojiSprite.userData.bobbingEnabled) {
+          emojiSprite.userData.bobbingOffset += deltaTime * 2; // Bobbing speed
+          emojiSprite.position.y =
+            emojiSprite.userData.baseY +
+            Math.sin(emojiSprite.userData.bobbingOffset) * 0.2;
+        } else {
+          // Ensure the sprite stays at baseY if bobbing is disabled
+          emojiSprite.position.y = emojiSprite.userData.baseY;
+        }
+      });
+
       // Render the scene
       renderer.render(scene, camera);
     };
@@ -384,14 +402,13 @@ export default function ClubMap({ onClose, setCoordinates }) {
     // Create background layer
     const backgroundGeometry = new THREE.PlaneGeometry(roomSize, roomSize);
     const backgroundMaterial = new THREE.MeshBasicMaterial({
-        color: '#ed4984',
-        side: THREE.DoubleSide,
-      });
-    const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+      color: 0x1fc700, // Changed to neon green
+      side: THREE.DoubleSide,
+    });
     const backgroundPlane = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
     backgroundPlane.rotation.x = -Math.PI / 2;
-  backgroundPlane.position.y = 0.01; // Slightly below the bottom green tiles
-  scene.add(backgroundPlane);
+    backgroundPlane.position.y = 0.01; // Slightly below the bottom green tiles
+    scene.add(backgroundPlane);
 
     // Handle window resize
     const handleResize = () => {
@@ -612,6 +629,57 @@ export default function ClubMap({ onClose, setCoordinates }) {
     sceneRef.current.add(textSprite);
 
     return textSprite;
+  }
+
+  // Helper function to create emoji sprites at given positions
+  function createEmojiSpriteAtPosition(symbol, xPos, zPos) {
+    // Create a canvas to render the emoji
+    const emojiCanvas = document.createElement('canvas');
+    emojiCanvas.width = 64;
+    emojiCanvas.height = 64;
+    const emojiContext = emojiCanvas.getContext('2d');
+    emojiContext.font = '48px Arial';
+    emojiContext.textAlign = 'center';
+    emojiContext.textBaseline = 'middle';
+    emojiContext.fillText(symbol, 32, 32);
+
+    // Create a texture from the canvas
+    const emojiTexture = new THREE.CanvasTexture(emojiCanvas);
+
+    // Create a sprite material with the texture
+    const emojiMaterial = new THREE.SpriteMaterial({
+      map: emojiTexture,
+      transparent: true,
+    });
+
+    // Create the sprite
+    const emojiSprite = new THREE.Sprite(emojiMaterial);
+
+    // Set initial y position and bobbing behavior based on the symbol
+    let yPos = 0.5;            // Default height for bobbing emojis
+    let bobbingEnabled = true; // Enable bobbing by default
+
+    // Check if the symbol should not bob
+    if (symbol === '🪜' || symbol === '🪑') {
+      yPos = 0.5;              // Adjust yPos so they sit on the floor
+      bobbingEnabled = false;  // Disable bobbing
+    }
+
+    // Position the sprite
+    emojiSprite.position.set(xPos, yPos, zPos);
+    emojiSprite.scale.set(1, 1, 1); // Adjust size as needed
+
+    // Store animation data
+    emojiSprite.userData = {
+      baseY: yPos,
+      rotationSpeed: Math.random() * 0.01 + 0.005, // Random rotation speed
+      bobbingOffset: Math.random() * Math.PI * 2,  // Random phase
+      bobbingEnabled: bobbingEnabled,              // Bobbing flag
+    };
+
+    // Add the sprite to the scene
+    sceneRef.current.add(emojiSprite);
+    emojiSpritesRef.current.push(emojiSprite);
   }
 
   return (

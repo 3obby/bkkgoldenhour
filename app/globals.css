@@ -959,6 +959,25 @@ body {
   font-size: 3em;
   text-align: center;
   margin-bottom: 10px;
+  position: absolute;
+
+}
+@keyframes bobbing {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.customer-icon.animate-bob {
+  animation: bobbing 2s infinite;
+  bottom: 10px; /* Adjust as needed for floating position */
+}
+
+.customer-icon.on-floor {
+  bottom: 0; /* Emoji stays on the floor */
 }
 
 /* Adjusted Orders List for Div Container */
