@@ -18,7 +18,7 @@ function LoadingDots() {
   return <span className="loading-animation">{dots}</span>;
 }
 
-function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
+function OrderItem({ order, handleOrderComplete, loadingOrderId, templateData }) {
   const checkButtonRef = useRef(null);
 
   // Add state and refs for confirmation logic
@@ -64,40 +64,49 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
   // Extract customer icon
   const customerIcon = order.customer?.customerIcon || '👤';
 
+  // Add a function to translate the x, z coordinates
+  const translateCoordinates = (x, z) => {
+    return {
+      x: -x, // Change the sign of x
+      z: z   // Keep z the same
+    };
+  };
+
   // Function to render the grid
   const renderGrid = () => {
-    const gridSize = 10;
-    const grid = [];
+    // Parse templateData into a 2D array
+    const rows = templateData.trim().split('\n');
+    const grid = rows.map(row => row.trim().split(' '));
 
-    // Initialize grid with 'X's
-    for (let y = 0; y < gridSize; y++) {
-      const row = [];
-      for (let x = 0; x < gridSize; x++) {
-        row.push('X');
-      }
-      grid.push(row);
-    }
+    // Get grid dimensions
+    const gridHeight = grid.length;
+    const gridWidth = grid[0].length;
 
-    // Map the order onto the grid based on x and z (y) coordinates
-    const xIndex = Math.round(order.x + 5);
-    const yIndex = Math.round(order.z + 5); // z is y
+    // Translate the order's coordinates
+    const { x: transformedX, z: transformedZ } = translateCoordinates(order.x, order.z);
+
+    // Map the order onto the grid based on the transformed coordinates
+    const xIndex = Math.max(0, Math.min(Math.floor(transformedX + 5), gridWidth - 1));
+
+    // Adjust the yIndex to flip the coordinate mapping
+    const yIndex = Math.max(0, Math.min(gridHeight - 1 - Math.floor(transformedZ + 5), gridHeight - 1));
 
     if (
-      xIndex >= 0 && xIndex < gridSize &&
-      yIndex >= 0 && yIndex < gridSize
+      xIndex >= 0 && xIndex < gridWidth &&
+      yIndex >= 0 && yIndex < gridHeight
     ) {
       grid[yIndex][xIndex] = order.customer?.customerIcon || '👤';
     }
 
-    // Render the grid
+    // Render the grid without reversing
     return (
       <div className="grid-container">
         {grid.map((row, rowIndex) => (
           <div key={rowIndex} className="grid-row">
             {row.map((cell, colIndex) => (
-              <div key={colIndex} className="grid-cell">
+              <span key={colIndex} className="grid-cell">
                 {cell !== 'X' ? cell : ''}
-              </div>
+              </span>
             ))}
           </div>
         ))}
@@ -107,21 +116,24 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
 
   return (
     <li className={`order-item ${isConfirming ? 'flashing-red' : ''}`}>
-      {order.status !== 'completed' && (
+      {/* Wrap the buttons in a container */}
+      <div className="button-group">
+        {order.status !== 'completed' && (
+          <button
+            onClick={handleCheckButtonClick}
+            className={`complete-button check-button-responsive ${isConfirming ? 'confirming' : ''}`}
+            ref={checkButtonRef}
+          >
+            {isConfirming ? '❎' : '👍'}
+          </button>
+        )}
         <button
-          onClick={handleCheckButtonClick}
-          className={`complete-button check-button-responsive ${isConfirming ? 'confirming' : ''}`}
-          ref={checkButtonRef}
+          onClick={() => setIsGridModalOpen(true)}
+          className="grid-button"
         >
-          {isConfirming ? '❎' : '👍'}
+          🗺️
         </button>
-      )}
-      <button
-        onClick={() => setIsGridModalOpen(true)}
-        className="grid-button"
-      >
-        Open Grid
-      </button>
+      </div>
 
       <div className="order-content">
         <h2>
@@ -177,12 +189,18 @@ function OrderItem({ order, handleOrderComplete, loadingOrderId }) {
 
       {/* Modal for displaying the grid */}
       {isGridModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div
+          className="order-modal-overlay"
+          onClick={() => setIsGridModalOpen(false)} // Close modal on overlay click
+        >
+          <div
+            className="order-modal-content"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          >
             {renderGrid()}
             <button
               onClick={() => setIsGridModalOpen(false)}
-              className="modal-close-button"
+              className="order-modal-close-button"
             >
               Close
             </button>
@@ -206,6 +224,19 @@ export default function Orders() {
 
   // Use a ref to track if it's the initial load
   const isInitialLoad = useRef(true);
+
+  const templateData = `
+  X X X X X X X 💨 💨 💨
+  X 🍻 🍻 🍻 🍻 🍻 X 💨 💨 💨
+  X X X X X X X 💨 💨 💨
+  X X X X X X X 💨 💨 💨
+  X X X X X X X 💨 💨 💨
+  X X X X X X X 💨 💨 💨
+  X X X X X X X 💨 💨 💨
+  X X X X X 🪜 🪜 💨 💨 💨
+  X X X X X 🪜 🪜 💨 💨 💨
+  X X X X X 🪜 🪜 💨 💨 💨
+  `;
 
   useEffect(() => {
     let isMounted = true; // To prevent state updates if component is unmounted
@@ -300,7 +331,7 @@ export default function Orders() {
     }, {});
 
     ordersContent = Object.entries(ordersByCustomer).map(([customerId, customerOrders]) => {
-      const customerIcon = customerOrders[0].customer?.customerIcon || '👤';
+      const customerIcon = customerOrders[0].customer?.customerIcon || '';
       return (
         <div key={customerId} className="customer-group">
           <h2 className="customer-icon">{customerIcon}</h2>
@@ -310,6 +341,7 @@ export default function Orders() {
               order={order}
               handleOrderComplete={handleOrderComplete}
               loadingOrderId={loadingOrderId}
+              templateData={templateData}
             />
           ))}
         </div>
@@ -322,6 +354,7 @@ export default function Orders() {
         order={order}
         handleOrderComplete={handleOrderComplete}
         loadingOrderId={loadingOrderId}
+        templateData={templateData}
       />
     ));
   }
