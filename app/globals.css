@@ -770,6 +770,27 @@ body {
   margin: 40px;
 }
 
+/* Submit button */
+.submit-button-new-o {
+  background: linear-gradient(45deg, #37c019, #3fab1e, #467a3b, #196b21);
+  background-size: 200% 200%;
+  font-size: 48px;
+  cursor: pointer;
+  color: white;
+  text-shadow:
+    -2px -2px 0 #ff1493,
+     2px -2px 0 #ff1493,
+    -2px 2px 0 #ff1493,
+     2px 2px 0 #ff1493;
+  
+  /* Updated animation */
+  animation: submitButtonAnimation 4s infinite;
+  position: relative; /* Required for the spinning glow effect */
+  transform-origin: center; /* Ensure rotation occurs around the center */
+  width: 140px;
+  height: 100px;
+}
+
 /* New keyframes for the button animation */
 @keyframes submitButtonAnimation {
   0% {

@@ -768,7 +768,7 @@ export default function ClubMap({ onClose, setCoordinates, comments, selectedOpt
               <div>🧑‍🍳👍</div>
             ) : (
               <button
-                className="submit-button-new"
+                className="submit-button-new-o"
                 onClick={handleConfirm}
                 style={{
                   position: 'absolute',
