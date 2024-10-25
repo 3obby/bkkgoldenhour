@@ -96,16 +96,47 @@ export default function OrderModal({ onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
 
-        {/* Emoji Picker */}
-        {showEmojiPicker && (
-          <div
-            className="emoji-picker-container"
-            onClick={(e) => e.stopPropagation()} // Stop click propagation
-          >
-            <EmojiPicker onEmojiClick={handleEmojiClick} />
-          </div>
-        )}
+      <div className="map-icon-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <button onClick={() => setShowClubMap(true)} className={`map-icon-o ${!coordinates ? 'submit-button-new' : ''}`}>
+                🗺️
+              </button>
+              {/* Display coordinates if they exist */}
+              {coordinates && (
+                <span className="coordinates-display" style={{
+                  color: '#ff1493',
+                  marginTop: '5px',
+                  textAlign: 'center'
+                }}>
+                  ({coordinates.x}, {coordinates.z})
+                </span>
+              )}
+            </div>
+            {coordinates && (
+              <div className="submit-button-container-new">
+                {isLoading ? (
+                  <div className="loading-animation">⏳</div>
+                ) : (
+                  <button
+                    onClick={handleButtonClick}
+                    className="submit-button-new"
+                    ref={buttonRef}
+                  >
+                    👍👨‍🍳
+                  </button>
+                )}
+              </div>
+            )}
 
+
+ {/* Total Price Display */}
+ <div className="mt-6 mb-4">
+              <h2 className="text-4xl font-bold text-center">
+                <span className="text-yellow-400">
+                  {order.reduce((total, item) => total + (item.price * item.quantity), 0)}
+                </span>
+                <span className="text-white">฿</span>
+              </h2>
+            </div>
 
 
         {/* Order Content */}
@@ -196,15 +227,7 @@ export default function OrderModal({ onClose }) {
                 </li>
               ))}
             </ul>
-            {/* Total Price Display */}
-            <div className="mt-6 mb-4">
-              <h2 className="text-4xl font-bold text-center">
-                <span className="text-yellow-400">
-                  {order.reduce((total, item) => total + (item.price * item.quantity), 0)}
-                </span>
-                <span className="text-white">฿</span>
-              </h2>
-            </div>
+           
           </div>
         )}
                 {/* Club Map */}
@@ -218,36 +241,7 @@ export default function OrderModal({ onClose }) {
             onCloseOrderModal={onClose}
           />
         )}
-         <div className="map-icon-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <button onClick={() => setShowClubMap(true)} className={`map-icon ${!coordinates ? 'submit-button-new' : ''}`}>
-                🗺️
-              </button>
-              {/* Display coordinates if they exist */}
-              {coordinates && (
-                <span className="coordinates-display" style={{
-                  color: '#ff1493',
-                  marginTop: '5px',
-                  textAlign: 'center'
-                }}>
-                  ({coordinates.x}, {coordinates.z})
-                </span>
-              )}
-            </div>
-            {coordinates && (
-              <div className="submit-button-container-new">
-                {isLoading ? (
-                  <div className="loading-animation">⏳</div>
-                ) : (
-                  <button
-                    onClick={handleButtonClick}
-                    className="submit-button-new"
-                    ref={buttonRef}
-                  >
-                    👍👨‍🍳
-                  </button>
-                )}
-              </div>
-            )}
+         
       </div>
     </div>
   );

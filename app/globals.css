@@ -767,6 +767,7 @@ body {
   animation: submitButtonAnimation 4s infinite;
   position: relative; /* Required for the spinning glow effect */
   transform-origin: center; /* Ensure rotation occurs around the center */
+  margin: 40px;
 }
 
 /* New keyframes for the button animation */
@@ -1727,7 +1728,7 @@ body {
 
 /* Optionally adjust the map icon style */
 .map-icon {
-  margin: 0 auto; /* Ensure the icon is centered inside the container */
+  margin-top: 40px; /* Ensure the icon is centered inside the container */
 }
 
 /* Styles for the grid modal */
