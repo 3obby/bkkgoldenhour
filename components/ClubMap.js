@@ -32,6 +32,9 @@ export default function ClubMap({ onClose, setCoordinates, comments, selectedOpt
   const [isLoading, setIsLoading] = useState(false);
   const [submissionComplete, setSubmissionComplete] = useState(false);
 
+  // Add state variable for toggling emojis
+  const [isPointingUp, setIsPointingUp] = useState(true);
+
   useEffect(() => {
     const currentMount = mountRef.current;
 
@@ -440,6 +443,15 @@ export default function ClubMap({ onClose, setCoordinates, comments, selectedOpt
     };
   }, []);
 
+  useEffect(() => {
+    // Toggle the emoji every 3 seconds
+    const interval = setInterval(() => {
+      setIsPointingUp(prev => !prev);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Handle click event to generate 'ping' effect
   const handleClick = (event) => {
     event.preventDefault();
@@ -727,12 +739,16 @@ export default function ClubMap({ onClose, setCoordinates, comments, selectedOpt
               top: '15%',
               left: '50%',
               transform: 'translateX(-50%)',
-              fontSize: '2.2em',
               zIndex: 10,
             }}
           >
-            🫵🗺️❓
+            <div
+              className={isPointingUp ? 'pointing-up' : 'pointing-down'}
+              style={{ fontSize: '2.2em' }}
+            >
+              {isPointingUp ? '🫵🗺️❓' : '👇🗺️❓'}
             </div>
+          </div>
     
   
 
